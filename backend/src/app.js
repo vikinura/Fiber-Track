@@ -1,9 +1,19 @@
 import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
 import pool from './config/db.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import authRoutes from './modules/auth/auth.routes.js';
 
 const app = express();
+
+// Security middlewares
+app.use(helmet());
+app.use(cors({
+  origin: '*', // can be restricted to specific frontend origins or allow local emulator
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
