@@ -11,6 +11,15 @@ export class AuthController {
       next(error);
     }
   }
+
+  async me(req, res, next) {
+    try {
+      const result = await authService.getMe(req.auth.userId);
+      return sendSuccess(res, result, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new AuthController();
