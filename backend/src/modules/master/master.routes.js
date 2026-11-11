@@ -12,5 +12,6 @@ router.get('/odps', masterController.getOdps);
 router.get('/issue-types', masterController.getIssueTypes);
 router.get('/priorities', masterController.getPriorities);
 router.get('/customers', masterController.getCustomers);
+router.get('/vendors', masterController.getVendors);
 
 export default router;

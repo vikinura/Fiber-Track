@@ -5,6 +5,7 @@ import pool from './config/db.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import masterRoutes from './modules/master/master.routes.js';
+import userRoutes from './modules/users/users.routes.js';
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.get('/health', async (req, res) => {
 // API routes prefix /api/v1
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1', masterRoutes);
+app.use('/api/v1', userRoutes);
 
 // Centralized error handler
 app.use(errorHandler);

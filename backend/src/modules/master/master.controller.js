@@ -56,6 +56,16 @@ export class MasterController {
       next(error);
     }
   }
+
+  async getVendors(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const vendors = await masterService.getActiveVendors(tenantId);
+      return sendSuccess(res, vendors);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new MasterController();

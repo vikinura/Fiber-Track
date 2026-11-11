@@ -3,6 +3,7 @@ import odpRepository from './odps.repository.js';
 import issueTypeRepository from './issue_types.repository.js';
 import priorityRepository from './priorities.repository.js';
 import customerRepository from './customers.repository.js';
+import vendorRepository from './vendors.repository.js';
 
 export class MasterService {
   async getAreas(tenantId) {
@@ -23,6 +24,10 @@ export class MasterService {
 
   async getCustomers(tenantId, { search, page, limit }) {
     return customerRepository.findByTenantId(tenantId, { search, page, limit });
+  }
+
+  async getActiveVendors(tenantId) {
+    return vendorRepository.findActiveByTenantId(tenantId);
   }
 }
 
