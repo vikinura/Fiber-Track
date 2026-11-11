@@ -22,6 +22,26 @@ export class MasterController {
       next(error);
     }
   }
+
+  async getIssueTypes(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const issueTypes = await masterService.getIssueTypes(tenantId);
+      return sendSuccess(res, issueTypes);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getPriorities(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const priorities = await masterService.getPriorities(tenantId);
+      return sendSuccess(res, priorities);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new MasterController();

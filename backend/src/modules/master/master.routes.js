@@ -9,5 +9,7 @@ router.use(auth);
 
 router.get('/areas', masterController.getAreas);
 router.get('/odps', masterController.getOdps);
+router.get('/issue-types', masterController.getIssueTypes);
+router.get('/priorities', masterController.getPriorities);
 
 export default router;
