@@ -42,6 +42,20 @@ export class MasterController {
       next(error);
     }
   }
+
+  async getCustomers(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const search = req.query.search || req.query.q || '';
+      const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 10));
+
+      const result = await masterService.getCustomers(tenantId, { search, page, limit });
+      return sendSuccess(res, result.data, 200, result.meta);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new MasterController();
