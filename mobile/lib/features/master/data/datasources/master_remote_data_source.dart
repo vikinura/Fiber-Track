@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 
 import '../../../../core/error/exceptions.dart';
+import '../../../../core/models/paginated_result.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/network/error_mapper.dart';
 import '../models/area_model.dart';
+import '../models/customer_model.dart';
 import '../models/issue_type_model.dart';
 import '../models/odp_model.dart';
 import '../models/priority_model.dart';
@@ -13,6 +15,11 @@ abstract class MasterRemoteDataSource {
   Future<List<OdpModel>> getOdps({int? areaId});
   Future<List<IssueTypeModel>> getIssueTypes();
   Future<List<PriorityModel>> getPriorities();
+  Future<PaginatedResult<CustomerModel>> getCustomers({
+    String? search,
+    int page = 1,
+    int limit = 10,
+  });
 }
 
 class MasterRemoteDataSourceImpl implements MasterRemoteDataSource {
@@ -119,6 +126,56 @@ class MasterRemoteDataSourceImpl implements MasterRemoteDataSource {
         return (responseData['data'] as List)
             .map((item) => PriorityModel.fromJson(item as Map<String, dynamic>))
             .toList();
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    } catch (e) {
+      if (e is ServerException ||
+          e is UnauthorizedException ||
+          e is ValidationException ||
+          e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<PaginatedResult<CustomerModel>> getCustomers({
+    String? search,
+    int page = 1,
+    int limit = 10,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{'page': page, 'limit': limit};
+      if (search != null && search.trim().isNotEmpty) {
+        queryParams['search'] = search.trim();
+      }
+
+      final response = await dioClient.dio.get(
+        '/customers',
+        queryParameters: queryParams,
+      );
+      final responseData = response.data;
+
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is List) {
+        final data = (responseData['data'] as List)
+            .map((item) => CustomerModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+        final meta = responseData['meta'] as Map<String, dynamic>? ?? {};
+        final total = meta['total'] is int
+            ? meta['total'] as int
+            : int.tryParse(meta['total']?.toString() ?? '0') ?? data.length;
+
+        return PaginatedResult<CustomerModel>(
+          data: data,
+          page: page,
+          limit: limit,
+          total: total,
+        );
       }
       throw const ServerException(message: 'Format respons tidak valid');
     } on DioException catch (e) {

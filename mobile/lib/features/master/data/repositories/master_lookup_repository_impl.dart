@@ -1,8 +1,10 @@
 import 'package:fpdart/fpdart.dart';
 
 import '../../../../core/error/failures.dart';
+import '../../../../core/models/paginated_result.dart';
 import '../../../../core/network/error_mapper.dart';
 import '../../domain/entities/area.dart';
+import '../../domain/entities/customer.dart';
 import '../../domain/entities/issue_type.dart';
 import '../../domain/entities/odp.dart';
 import '../../domain/entities/priority.dart';
@@ -49,6 +51,31 @@ class MasterLookupRepositoryImpl implements MasterLookupRepository {
     try {
       final models = await remoteDataSource.getPriorities();
       return Right(models.map((m) => m.toEntity()).toList());
+    } on Exception catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, PaginatedResult<Customer>>> getCustomers({
+    String? search,
+    int page = 1,
+    int limit = 10,
+  }) async {
+    try {
+      final result = await remoteDataSource.getCustomers(
+        search: search,
+        page: page,
+        limit: limit,
+      );
+      return Right(
+        PaginatedResult<Customer>(
+          data: result.data.map((m) => m.toEntity()).toList(),
+          page: result.page,
+          limit: result.limit,
+          total: result.total,
+        ),
+      );
     } on Exception catch (e) {
       return Left(mapExceptionToFailure(e));
     }
