@@ -1,0 +1,163 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+    "name": "Fiber Track Master Lookups API",
+    "description": "Koleksi Postman untuk modul Master Lookup Fiber Track API dengan skenario multi-tenant",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Master - Get Areas (Tenant A)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_tenant_admin}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/areas",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "areas"]
+        }
+      }
+    },
+    {
+      "name": "Master - Get ODPs (Tenant A - All)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_tenant_admin}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/odps",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "odps"]
+        }
+      }
+    },
+    {
+      "name": "Master - Get ODPs (Tenant A - Filter Area 1)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_tenant_admin}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/odps?area_id=1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "odps"],
+          "query": [
+            { "key": "area_id", "value": "1" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Master - Get Issue Types",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_tenant_admin}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/issue-types",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "issue-types"]
+        }
+      }
+    },
+    {
+      "name": "Master - Get Priorities",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_tenant_admin}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/priorities",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "priorities"]
+        }
+      }
+    },
+    {
+      "name": "Master - Get Customers (Pagination)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_tenant_admin}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/customers?page=1&limit=10",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "customers"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Master - Get Customers (Search)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_tenant_admin}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/customers?search=Megah",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "customers"],
+          "query": [
+            { "key": "search", "value": "Megah" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Master - Get Active Vendors",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_tenant_admin}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/vendors",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "vendors"]
+        }
+      }
+    },
+    {
+      "name": "Master - Get Technicians (Vendor Admin Only)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_vendor_admin}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/users?role=technician",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "users"],
+          "query": [
+            { "key": "role", "value": "technician" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Master - Isolation Test (Tenant B cannot see Tenant A areas)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token_tenant_b}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/areas",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "areas"]
+        }
+      }
+    }
+  ]
+}

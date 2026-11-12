@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import masterController from './master.controller.js';
 import { auth } from '../../middlewares/auth.js';
+import { requireRole } from '../../middlewares/requireRole.js';
 
 const router = Router();
 
-// Routes are protected by auth middleware; tenantId is extracted from req.auth
+// Endpoint master hanya untuk role tenant_admin
 router.use(auth);
+router.use(requireRole('tenant_admin'));
 
 router.get('/areas', masterController.getAreas);
 router.get('/odps', masterController.getOdps);

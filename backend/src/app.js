@@ -46,8 +46,8 @@ app.get('/health', async (req, res) => {
 
 // API routes prefix /api/v1
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
 app.use('/api/v1', masterRoutes);
-app.use('/api/v1', userRoutes);
 
 // Centralized error handler
 app.use(errorHandler);
