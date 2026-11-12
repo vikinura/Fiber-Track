@@ -9,6 +9,14 @@ import '../../features/auth/domain/usecases/get_current_user.dart';
 import '../../features/auth/domain/usecases/login.dart';
 import '../../features/auth/domain/usecases/logout.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/master/data/datasources/master_remote_data_source.dart';
+import '../../features/master/data/repositories/master_lookup_repository_impl.dart';
+import '../../features/master/domain/repositories/master_lookup_repository.dart';
+import '../../features/master/domain/usecases/get_areas.dart';
+import '../../features/master/domain/usecases/get_customers.dart';
+import '../../features/master/domain/usecases/get_issue_types.dart';
+import '../../features/master/domain/usecases/get_odps.dart';
+import '../../features/master/domain/usecases/get_priorities.dart';
 import '../network/dio_client.dart';
 import '../network/token_storage.dart';
 import '../theme/theme_cubit.dart';
@@ -59,5 +67,32 @@ Future<void> initDependencies() async {
       getCurrentUser: getIt<GetCurrentUser>(),
       logout: getIt<Logout>(),
     ),
+  );
+
+  // Master Data Sources & Repository
+  getIt.registerLazySingleton<MasterRemoteDataSource>(
+    () => MasterRemoteDataSourceImpl(dioClient: getIt<DioClient>()),
+  );
+  getIt.registerLazySingleton<MasterLookupRepository>(
+    () => MasterLookupRepositoryImpl(
+      remoteDataSource: getIt<MasterRemoteDataSource>(),
+    ),
+  );
+
+  // Master Use Cases
+  getIt.registerLazySingleton<GetAreas>(
+    () => GetAreas(getIt<MasterLookupRepository>()),
+  );
+  getIt.registerLazySingleton<GetOdps>(
+    () => GetOdps(getIt<MasterLookupRepository>()),
+  );
+  getIt.registerLazySingleton<GetIssueTypes>(
+    () => GetIssueTypes(getIt<MasterLookupRepository>()),
+  );
+  getIt.registerLazySingleton<GetPriorities>(
+    () => GetPriorities(getIt<MasterLookupRepository>()),
+  );
+  getIt.registerLazySingleton<GetCustomers>(
+    () => GetCustomers(getIt<MasterLookupRepository>()),
   );
 }
