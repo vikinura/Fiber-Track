@@ -1,0 +1,259 @@
+import 'package:dio/dio.dart';
+
+import '../../../../core/error/exceptions.dart';
+import '../../../../core/models/paginated_result.dart';
+import '../../../../core/network/dio_client.dart';
+import '../../../../core/network/error_mapper.dart';
+import '../models/ticket_history_model.dart';
+import '../models/ticket_model.dart';
+
+abstract class TicketRemoteDataSource {
+  Future<PaginatedResult<TicketModel>> getTickets({
+    int page = 1,
+    int limit = 10,
+    String? status,
+    int? areaId,
+    int? vendorId,
+    String? sla,
+    String? q,
+  });
+
+  Future<TicketModel> getTicketDetail(int id);
+
+  Future<List<TicketHistoryModel>> getTicketHistories(int ticketId);
+
+  Future<TicketModel> createTicket({
+    required int customerId,
+    required int areaId,
+    int? odpId,
+    required int issueTypeId,
+    required int priorityId,
+    required String description,
+    double? latitude,
+    double? longitude,
+  });
+
+  Future<TicketModel> updateTicket({
+    required int id,
+    required int customerId,
+    required int areaId,
+    int? odpId,
+    required int issueTypeId,
+    required int priorityId,
+    required String description,
+    double? latitude,
+    double? longitude,
+  });
+}
+
+class TicketRemoteDataSourceImpl implements TicketRemoteDataSource {
+  final DioClient dioClient;
+
+  TicketRemoteDataSourceImpl({required this.dioClient});
+
+  @override
+  Future<PaginatedResult<TicketModel>> getTickets({
+    int page = 1,
+    int limit = 10,
+    String? status,
+    int? areaId,
+    int? vendorId,
+    String? sla,
+    String? q,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{'page': page, 'limit': limit};
+      if (status != null && status.isNotEmpty) queryParams['status'] = status;
+      if (areaId != null) queryParams['area_id'] = areaId;
+      if (vendorId != null) queryParams['vendor_id'] = vendorId;
+      if (sla != null && sla.isNotEmpty) queryParams['sla'] = sla;
+      if (q != null && q.trim().isNotEmpty) queryParams['q'] = q.trim();
+
+      final response = await dioClient.dio.get(
+        '/tickets',
+        queryParameters: queryParams,
+      );
+
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is List) {
+        final data = (responseData['data'] as List)
+            .map((item) => TicketModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+        final meta = responseData['meta'] as Map<String, dynamic>? ?? {};
+        final total = meta['total'] is int
+            ? meta['total'] as int
+            : int.tryParse(meta['total']?.toString() ?? '0') ?? data.length;
+
+        return PaginatedResult<TicketModel>(
+          data: data,
+          page: page,
+          limit: limit,
+          total: total,
+        );
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    } catch (e) {
+      if (e is ServerException ||
+          e is UnauthorizedException ||
+          e is ValidationException ||
+          e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<TicketModel> getTicketDetail(int id) async {
+    try {
+      final response = await dioClient.dio.get('/tickets/$id');
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is Map<String, dynamic>) {
+        return TicketModel.fromJson(
+          responseData['data'] as Map<String, dynamic>,
+        );
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    } catch (e) {
+      if (e is ServerException ||
+          e is UnauthorizedException ||
+          e is ValidationException ||
+          e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<List<TicketHistoryModel>> getTicketHistories(int ticketId) async {
+    try {
+      final response = await dioClient.dio.get('/tickets/$ticketId/histories');
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is List) {
+        return (responseData['data'] as List)
+            .map(
+              (item) =>
+                  TicketHistoryModel.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    } catch (e) {
+      if (e is ServerException ||
+          e is UnauthorizedException ||
+          e is ValidationException ||
+          e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<TicketModel> createTicket({
+    required int customerId,
+    required int areaId,
+    int? odpId,
+    required int issueTypeId,
+    required int priorityId,
+    required String description,
+    double? latitude,
+    double? longitude,
+  }) async {
+    try {
+      final payload = <String, dynamic>{
+        'customer_id': customerId,
+        'area_id': areaId,
+        'odp_id': odpId,
+        'issue_type_id': issueTypeId,
+        'priority_id': priorityId,
+        'description': description,
+        'latitude': latitude,
+        'longitude': longitude,
+      };
+
+      final response = await dioClient.dio.post('/tickets', data: payload);
+
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is Map<String, dynamic>) {
+        return TicketModel.fromJson(
+          responseData['data'] as Map<String, dynamic>,
+        );
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    } catch (e) {
+      if (e is ServerException ||
+          e is UnauthorizedException ||
+          e is ValidationException ||
+          e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<TicketModel> updateTicket({
+    required int id,
+    required int customerId,
+    required int areaId,
+    int? odpId,
+    required int issueTypeId,
+    required int priorityId,
+    required String description,
+    double? latitude,
+    double? longitude,
+  }) async {
+    try {
+      final payload = <String, dynamic>{
+        'customer_id': customerId,
+        'area_id': areaId,
+        'odp_id': odpId,
+        'issue_type_id': issueTypeId,
+        'priority_id': priorityId,
+        'description': description,
+        'latitude': latitude,
+        'longitude': longitude,
+      };
+
+      final response = await dioClient.dio.put('/tickets/$id', data: payload);
+
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is Map<String, dynamic>) {
+        return TicketModel.fromJson(
+          responseData['data'] as Map<String, dynamic>,
+        );
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    } catch (e) {
+      if (e is ServerException ||
+          e is UnauthorizedException ||
+          e is ValidationException ||
+          e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException(message: e.toString());
+    }
+  }
+}
