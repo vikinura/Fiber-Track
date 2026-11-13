@@ -7,7 +7,10 @@ import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/loading_view.dart';
 import '../../../../core/widgets/sla_badge.dart';
 import '../../../../core/widgets/status_chip.dart';
+import '../../../master/domain/entities/vendor.dart';
+import '../../../master/domain/usecases/get_vendors.dart';
 import '../../domain/entities/ticket.dart';
+import '../widgets/vendor_picker_bottom_sheet.dart';
 import '../../domain/entities/ticket_history.dart';
 import '../../domain/entities/ticket_status.dart';
 import '../bloc/ticket_detail_bloc.dart';
@@ -26,7 +29,26 @@ class TicketDetailPage extends StatelessWidget {
           getIt<TicketDetailBloc>()..add(LoadTicketDetail(ticketId)),
       child: Scaffold(
         appBar: AppBar(title: const Text('Detail Tiket')),
-        body: BlocBuilder<TicketDetailBloc, TicketDetailState>(
+        body: BlocConsumer<TicketDetailBloc, TicketDetailState>(
+          listener: (context, state) {
+            if (state is TicketDetailLoaded) {
+              if (state.actionSuccessMessage != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.actionSuccessMessage!),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else if (state.actionErrorMessage != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.actionErrorMessage!),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
+          },
           builder: (context, state) {
             if (state is TicketDetailLoading) {
               return const LoadingView(message: 'Memuat detail tiket...');
@@ -128,18 +150,59 @@ class _TicketDetailContent extends StatelessWidget {
                 ),
                 if (ticket.status == TicketStatus.newStatus) ...[
                   const Divider(height: 24),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        context.push(
-                          '/tickets/${ticket.id}/edit',
-                          extra: ticket,
-                        );
-                      },
-                      icon: const Icon(Icons.edit, size: 18),
-                      label: const Text('Edit Tiket'),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          context.push(
+                            '/tickets/${ticket.id}/edit',
+                            extra: ticket,
+                          );
+                        },
+                        icon: const Icon(Icons.edit, size: 18),
+                        label: const Text('Edit Tiket'),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          final vendorsResult = await getIt<GetVendors>()
+                              .call();
+                          final vendorList = vendorsResult.fold(
+                            (f) => <Vendor>[],
+                            (v) => v,
+                          );
+                          if (!context.mounted) return;
+
+                          if (vendorList.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Tidak ada vendor aktif yang tersedia',
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          final selected = await VendorPickerBottomSheet.show(
+                            context: context,
+                            vendors: vendorList,
+                          );
+
+                          if (selected != null && context.mounted) {
+                            context.read<TicketDetailBloc>().add(
+                              ForwardTicketEvent(
+                                ticketId: ticket.id,
+                                vendorId: selected.id,
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.send_rounded, size: 18),
+                        label: const Text('Teruskan ke Vendor'),
+                      ),
+                    ],
                   ),
                 ],
               ],

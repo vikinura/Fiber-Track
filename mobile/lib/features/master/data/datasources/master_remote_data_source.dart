@@ -9,12 +9,14 @@ import '../models/customer_model.dart';
 import '../models/issue_type_model.dart';
 import '../models/odp_model.dart';
 import '../models/priority_model.dart';
+import '../models/vendor_model.dart';
 
 abstract class MasterRemoteDataSource {
   Future<List<AreaModel>> getAreas();
   Future<List<OdpModel>> getOdps({int? areaId});
   Future<List<IssueTypeModel>> getIssueTypes();
   Future<List<PriorityModel>> getPriorities();
+  Future<List<VendorModel>> getVendors();
   Future<PaginatedResult<CustomerModel>> getCustomers({
     String? search,
     int page = 1,
@@ -125,6 +127,32 @@ class MasterRemoteDataSourceImpl implements MasterRemoteDataSource {
           responseData['data'] is List) {
         return (responseData['data'] as List)
             .map((item) => PriorityModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    } catch (e) {
+      if (e is ServerException ||
+          e is UnauthorizedException ||
+          e is ValidationException ||
+          e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<List<VendorModel>> getVendors() async {
+    try {
+      final response = await dioClient.dio.get('/vendors');
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is List) {
+        return (responseData['data'] as List)
+            .map((item) => VendorModel.fromJson(item as Map<String, dynamic>))
             .toList();
       }
       throw const ServerException(message: 'Format respons tidak valid');

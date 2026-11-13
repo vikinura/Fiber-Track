@@ -44,6 +44,8 @@ abstract class TicketRemoteDataSource {
     double? latitude,
     double? longitude,
   });
+
+  Future<TicketModel> forwardTicket(int ticketId, int vendorId);
 }
 
 class TicketRemoteDataSourceImpl implements TicketRemoteDataSource {
@@ -234,6 +236,36 @@ class TicketRemoteDataSourceImpl implements TicketRemoteDataSource {
       };
 
       final response = await dioClient.dio.put('/tickets/$id', data: payload);
+
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is Map<String, dynamic>) {
+        return TicketModel.fromJson(
+          responseData['data'] as Map<String, dynamic>,
+        );
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    } catch (e) {
+      if (e is ServerException ||
+          e is UnauthorizedException ||
+          e is ValidationException ||
+          e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<TicketModel> forwardTicket(int ticketId, int vendorId) async {
+    try {
+      final response = await dioClient.dio.patch(
+        '/tickets/$ticketId/forward',
+        data: {'vendor_id': vendorId},
+      );
 
       final responseData = response.data;
       if (responseData is Map<String, dynamic> &&

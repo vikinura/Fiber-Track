@@ -42,4 +42,6 @@ abstract class TicketRepository {
     double? latitude,
     double? longitude,
   });
+
+  Future<Either<Failure, Ticket>> forwardTicket(int ticketId, int vendorId);
 }

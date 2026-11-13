@@ -15,3 +15,13 @@ class LoadTicketDetail extends TicketDetailEvent {
   @override
   List<Object?> get props => [ticketId];
 }
+
+class ForwardTicketEvent extends TicketDetailEvent {
+  final int ticketId;
+  final int vendorId;
+
+  const ForwardTicketEvent({required this.ticketId, required this.vendorId});
+
+  @override
+  List<Object?> get props => [ticketId, vendorId];
+}

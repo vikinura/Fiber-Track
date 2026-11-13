@@ -8,6 +8,7 @@ import '../../domain/entities/customer.dart';
 import '../../domain/entities/issue_type.dart';
 import '../../domain/entities/odp.dart';
 import '../../domain/entities/priority.dart';
+import '../../domain/entities/vendor.dart';
 import '../../domain/repositories/master_lookup_repository.dart';
 import '../datasources/master_remote_data_source.dart';
 
@@ -50,6 +51,16 @@ class MasterLookupRepositoryImpl implements MasterLookupRepository {
   Future<Either<Failure, List<Priority>>> getPriorities() async {
     try {
       final models = await remoteDataSource.getPriorities();
+      return Right(models.map((m) => m.toEntity()).toList());
+    } on Exception catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Vendor>>> getVendors() async {
+    try {
+      final models = await remoteDataSource.getVendors();
       return Right(models.map((m) => m.toEntity()).toList());
     } on Exception catch (e) {
       return Left(mapExceptionToFailure(e));
