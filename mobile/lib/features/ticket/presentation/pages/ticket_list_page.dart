@@ -78,7 +78,21 @@ class _TicketListViewState extends State<_TicketListView> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Daftar Tiket Gangguan')),
+      appBar: AppBar(
+        title: const Text('Daftar Tiket Gangguan'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_rounded),
+            tooltip: 'Buat Tiket',
+            onPressed: () async {
+              final result = await context.push('/tickets/create');
+              if (result == true && context.mounted) {
+                _applyFilters();
+              }
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           // Bar Pencarian & Filter

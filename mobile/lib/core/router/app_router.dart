@@ -6,6 +6,10 @@ import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/role_home_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/ticket/domain/entities/ticket.dart';
+import '../../features/ticket/presentation/pages/ticket_detail_page.dart';
+import '../../features/ticket/presentation/pages/ticket_form_page.dart';
+import '../../features/ticket/presentation/pages/ticket_list_page.dart';
 
 GoRouter createRouter(AuthBloc authBloc) {
   return GoRouter(
@@ -43,6 +47,28 @@ GoRouter createRouter(AuthBloc authBloc) {
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: '/tickets',
+        builder: (context, state) => const TicketListPage(),
+      ),
+      GoRoute(
+        path: '/tickets/create',
+        builder: (context, state) => const TicketFormPage(),
+      ),
+      GoRoute(
+        path: '/tickets/:id',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return TicketDetailPage(ticketId: id);
+        },
+      ),
+      GoRoute(
+        path: '/tickets/:id/edit',
+        builder: (context, state) {
+          final ticket = state.extra as Ticket?;
+          return TicketFormPage(ticket: ticket);
+        },
       ),
     ],
   );

@@ -84,13 +84,25 @@ class RoleHomePage extends StatelessWidget {
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(AppSizes.p16),
-                  child: Text(
-                    role == 'tenant_admin'
-                        ? 'Beranda Tiket & Dashboard Tenant'
-                        : role == 'vendor_admin'
-                        ? 'Beranda Tiket Masuk Vendor'
-                        : 'Beranda Tugas Saya (Teknisi)',
-                    style: theme.textTheme.bodyLarge,
+                  child: Column(
+                    children: [
+                      Text(
+                        role == 'tenant_admin'
+                            ? 'Beranda Tiket & Dashboard Tenant'
+                            : role == 'vendor_admin'
+                            ? 'Beranda Tiket Masuk Vendor'
+                            : 'Beranda Tugas Saya (Teknisi)',
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                      const SizedBox(height: AppSizes.p16),
+                      FilledButton.icon(
+                        onPressed: () {
+                          context.push('/tickets');
+                        },
+                        icon: const Icon(Icons.confirmation_number_outlined),
+                        label: const Text('Buka Daftar Tiket'),
+                      ),
+                    ],
                   ),
                 ),
               ),
