@@ -1,0 +1,215 @@
+{
+	"info": {
+		"_postman_id": "b3e21a4f-7f91-4927-9c99-ticket-core-001",
+		"name": "FiberTrack - Tickets",
+		"description": "Koleksi Postman untuk modul tiket dan uji isolasi hak akses (Fase 4)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Ticket (Success)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tenant_admin_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"customer_id\": 1,\n  \"area_id\": 1,\n  \"odp_id\": 1,\n  \"issue_type_id\": 1,\n  \"priority_id\": 1,\n  \"description\": \"Pelanggan tidak bisa terhubung sejak pagi, LOS merah\",\n  \"latitude\": -7.2625,\n  \"longitude\": 112.7483\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/tickets",
+					"host": ["{{base_url}}"],
+					"path": ["tickets"]
+				}
+			}
+		},
+		{
+			"name": "List Tickets - Tenant Admin",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tenant_admin_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/tickets?page=1&limit=10",
+					"host": ["{{base_url}}"],
+					"path": ["tickets"],
+					"query": [
+						{ "key": "page", "value": "1" },
+						{ "key": "limit", "value": "10" }
+					]
+				}
+			}
+		},
+		{
+			"name": "Ticket Detail",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tenant_admin_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/tickets/2",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2"]
+				}
+			}
+		},
+		{
+			"name": "Ticket Histories",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tenant_admin_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/tickets/2/histories",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2", "histories"]
+				}
+			}
+		},
+		{
+			"name": "Update Ticket (Status new)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tenant_admin_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"customer_id\": 1,\n  \"area_id\": 1,\n  \"odp_id\": 1,\n  \"issue_type_id\": 1,\n  \"priority_id\": 1,\n  \"description\": \"Deskripsi diperbarui oleh tenant admin\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/tickets/2",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2"]
+				}
+			}
+		},
+		{
+			"name": "Isolation Test 1: Tenant B reads Tenant A ticket (Expect 404)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tenant_b_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/tickets/2",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2"]
+				}
+			}
+		},
+		{
+			"name": "Isolation Test 3: Vendor reads ticket not assigned to them (Expect 404)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{vendor_admin_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/tickets/2",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2"]
+				}
+			}
+		},
+		{
+			"name": "Isolation Test 5: Technician reads ticket not assigned to them (Expect 404)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{technician_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/tickets/2",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2"]
+				}
+			}
+		},
+		{
+			"name": "Isolation Test 8: Request without token / invalid token (Expect 401)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/tickets/2",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2"]
+				}
+			}
+		},
+		{
+			"name": "Isolation Test 9: Spoofed tenant_id in body ignored (Expect 201 with auth tenant_id)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tenant_admin_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"tenant_id\": 999,\n  \"customer_id\": 1,\n  \"area_id\": 1,\n  \"odp_id\": 1,\n  \"issue_type_id\": 1,\n  \"priority_id\": 1,\n  \"description\": \"Spoofed tenant_id test\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/tickets",
+					"host": ["{{base_url}}"],
+					"path": ["tickets"]
+				}
+			}
+		}
+	]
+}
