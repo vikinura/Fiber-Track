@@ -8,6 +8,7 @@ import {
   updateTicketSchema,
   forwardTicketSchema,
   assignTicketSchema,
+  updateStatusSchema,
 } from './tickets.schema.js';
 
 const router = Router();
@@ -57,6 +58,14 @@ router.patch(
   requireRole('vendor_admin'),
   validate(assignTicketSchema),
   ticketController.assignTicket
+);
+
+// PATCH /tickets/:id/status — ubah status tiket (hanya technician pemilik)
+router.patch(
+  '/:id/status',
+  requireRole('technician'),
+  validate(updateStatusSchema),
+  ticketController.updateStatus
 );
 
 // POST /tickets — buat tiket baru

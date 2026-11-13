@@ -86,3 +86,25 @@ export const assignTicketSchema = {
     technician_id: z.coerce.number().int().positive('Teknisi wajib dipilih'),
   }),
 };
+
+export const updateStatusSchema = {
+  body: z
+    .object({
+      to_status: z.enum(['in_progress', 'resolved'], {
+        errorMap: () => ({ message: "Status tujuan hanya boleh 'in_progress' atau 'resolved'" }),
+      }),
+      note: z.string().trim().max(500, 'Catatan maksimal 500 karakter').optional().nullable(),
+    })
+    .refine(
+      (data) => {
+        if (data.to_status === 'resolved') {
+          return data.note && data.note.trim().length >= 5;
+        }
+        return true;
+      },
+      {
+        message: 'Catatan wajib diisi minimal 5 karakter saat status diselesaikan',
+        path: ['note'],
+      }
+    ),
+};

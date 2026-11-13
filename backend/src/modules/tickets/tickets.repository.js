@@ -255,6 +255,61 @@ export class TicketRepository {
   }
 
   /**
+   * Update status tiket oleh teknisi dalam transaksi DB
+   */
+  async updateTicketStatus(ticketId, vendorId, technicianId, fromStatus, toStatus, note, userId) {
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    try {
+      const isResolved = toStatus === 'resolved';
+
+      const updateSql = `
+        UPDATE tickets
+        SET
+          status = ?,
+          resolved_at = ${isResolved ? 'NOW()' : 'resolved_at'},
+          updated_at = NOW()
+        WHERE id = ? AND vendor_id = ? AND technician_id = ? AND status = ?
+      `;
+
+      const [updateResult] = await connection.query(updateSql, [
+        toStatus,
+        ticketId,
+        vendorId,
+        technicianId,
+        fromStatus,
+      ]);
+
+      if (updateResult.affectedRows === 0) {
+        throw new Error('TICKET_NOT_FOUND_OR_INVALID_STATUS');
+      }
+
+      // Catat riwayat
+      const historySql = `
+        INSERT INTO ticket_histories (
+          ticket_id, user_id, from_status, to_status, note, created_at
+        ) VALUES (?, ?, ?, ?, ?, NOW())
+      `;
+      await connection.query(historySql, [
+        ticketId,
+        userId,
+        fromStatus,
+        toStatus,
+        note || (isResolved ? 'Tiket diselesaikan oleh teknisi' : 'Tiket mulai dikerjakan'),
+      ]);
+
+      await connection.commit();
+      return true;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
+  /**
    * Assign ticket ke teknisi dalam transaksi DB
    */
   async assignTicket(ticketId, vendorId, technicianId, userId) {

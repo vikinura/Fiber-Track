@@ -5,6 +5,59 @@ import { ValidationError, NotFoundError, ConflictError } from '../../utils/error
 
 export class TicketService {
   /**
+   * Update status tiket (hanya role technician, hanya tiket miliknya, sesuai peta transisi)
+   */
+  async updateStatus(auth, ticketId, toStatus, note) {
+    const technicianId = auth.userId;
+    const vendorId = auth.vendorId;
+
+    // 1. Cek keberadaan tiket milik teknisi & vendor
+    const [tRows] = await pool.query(
+      'SELECT id, status FROM tickets WHERE id = ? AND vendor_id = ? AND technician_id = ?',
+      [ticketId, vendorId, technicianId]
+    );
+
+    if (!tRows || tRows.length === 0) {
+      throw new NotFoundError('Tiket tidak ditemukan atau bukan ditugaskan kepada Anda');
+    }
+
+    const currentStatus = tRows[0].status;
+
+    // 2. Validasi peta transisi: assigned -> in_progress -> resolved
+    if (toStatus === 'in_progress' && currentStatus !== 'assigned') {
+      throw new ConflictError(
+        `Tiket berstatus '${currentStatus}' tidak dapat diubah ke 'in_progress' (hanya tiket 'assigned')`
+      );
+    }
+
+    if (toStatus === 'resolved' && currentStatus !== 'in_progress') {
+      throw new ConflictError(
+        `Tiket berstatus '${currentStatus}' tidak dapat diubah ke 'resolved' (hanya tiket 'in_progress')`
+      );
+    }
+
+    // 3. Jalankan repository update & riwayat dalam transaksi
+    try {
+      await ticketRepository.updateTicketStatus(
+        ticketId,
+        vendorId,
+        technicianId,
+        currentStatus,
+        toStatus,
+        note,
+        auth.userId
+      );
+    } catch (err) {
+      if (err.message === 'TICKET_NOT_FOUND_OR_INVALID_STATUS') {
+        throw new ConflictError('Transisi status tiket gagal atau status tiket telah berubah');
+      }
+      throw err;
+    }
+
+    return this.getTicketById(auth, ticketId);
+  }
+
+  /**
    * Tugaskan teknisi ke tiket (hanya vendor_admin, tiket status 'forwarded', teknisi aktif milik vendor yang sama)
    */
   async assignTicket(auth, ticketId, technicianId) {
