@@ -6,6 +6,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import masterRoutes from './modules/master/master.routes.js';
 import userRoutes from './modules/users/users.routes.js';
+import ticketRoutes from './modules/tickets/tickets.routes.js';
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.get('/health', async (req, res) => {
 // API routes prefix /api/v1
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/tickets', ticketRoutes);
 app.use('/api/v1', masterRoutes);
 
 // Centralized error handler

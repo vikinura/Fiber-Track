@@ -1,0 +1,49 @@
+import { Router } from 'express';
+import ticketController from './tickets.controller.js';
+import { auth } from '../../middlewares/auth.js';
+import { requireRole } from '../../middlewares/requireRole.js';
+import { validate } from '../../middlewares/validate.js';
+import { createTicketSchema, updateTicketSchema } from './tickets.schema.js';
+
+const router = Router();
+
+router.use(auth);
+
+// GET /tickets — daftar tiket dicakup per peran (tenant_admin, vendor_admin, technician)
+router.get(
+  '/',
+  requireRole('tenant_admin', 'vendor_admin', 'technician'),
+  ticketController.getTickets
+);
+
+// GET /tickets/:id/histories — riwayat perubahan tiket
+router.get(
+  '/:id/histories',
+  requireRole('tenant_admin', 'vendor_admin', 'technician'),
+  ticketController.getTicketHistories
+);
+
+// GET /tickets/:id — detail tiket
+router.get(
+  '/:id',
+  requireRole('tenant_admin', 'vendor_admin', 'technician'),
+  ticketController.getTicketById
+);
+
+// PUT /tickets/:id — update tiket (hanya tenant_admin, hanya saat new)
+router.put(
+  '/:id',
+  requireRole('tenant_admin'),
+  validate(updateTicketSchema),
+  ticketController.updateTicket
+);
+
+// POST /tickets — buat tiket baru
+router.post(
+  '/',
+  requireRole('tenant_admin'),
+  validate(createTicketSchema),
+  ticketController.createTicket
+);
+
+export default router;
