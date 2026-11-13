@@ -9,7 +9,14 @@ const router = Router();
 
 router.use(auth);
 
-// Hanya tenant_admin yang dapat membuat tiket
+// GET /tickets — daftar tiket (hanya tenant_admin untuk T40; diperluas di T41)
+router.get(
+  '/',
+  requireRole('tenant_admin'),
+  ticketController.getTickets
+);
+
+// POST /tickets — buat tiket baru
 router.post(
   '/',
   requireRole('tenant_admin'),

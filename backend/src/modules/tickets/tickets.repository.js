@@ -35,6 +35,69 @@ export async function generateTicketNo(connection, tenantId, date = new Date()) 
 
 export class TicketRepository {
   /**
+   * Daftar tiket dengan paginasi (hanya tenant_admin – scope tenantId)
+   * @param {number} tenantId
+   * @param {{ page?: number, limit?: number }} opts
+   * @returns {{ data: object[], meta: { page, limit, total } }}
+   */
+  async findByTenantId(tenantId, { page = 1, limit = 10 } = {}) {
+    const offset = (page - 1) * limit;
+
+    const dataSql = `
+      SELECT
+        t.id,
+        t.ticket_no,
+        t.status,
+        t.description,
+        t.latitude,
+        t.longitude,
+        t.sla_due_at,
+        t.resolved_at,
+        t.created_at,
+        t.updated_at,
+        t.customer_id,
+        c.name  AS customer_name,
+        t.area_id,
+        a.name  AS area_name,
+        t.odp_id,
+        o.code  AS odp_code,
+        t.issue_type_id,
+        it.name AS issue_type_name,
+        t.priority_id,
+        p.name  AS priority_name,
+        p.sla_hours,
+        t.vendor_id,
+        v.name  AS vendor_name,
+        t.technician_id,
+        u.name  AS technician_name,
+        t.created_by
+      FROM tickets t
+      LEFT JOIN customers  c  ON c.id  = t.customer_id
+      LEFT JOIN areas      a  ON a.id  = t.area_id
+      LEFT JOIN odps       o  ON o.id  = t.odp_id
+      LEFT JOIN issue_types it ON it.id = t.issue_type_id
+      LEFT JOIN priorities p  ON p.id  = t.priority_id
+      LEFT JOIN vendors    v  ON v.id  = t.vendor_id
+      LEFT JOIN users      u  ON u.id  = t.technician_id
+      WHERE t.tenant_id = ?
+      ORDER BY t.created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    const countSql = `
+      SELECT COUNT(*) AS total FROM tickets WHERE tenant_id = ?
+    `;
+
+    const [rows] = await pool.query(dataSql, [tenantId, limit, offset]);
+    const [[{ total }]] = await pool.query(countSql, [tenantId]);
+
+    return {
+      data: rows,
+      meta: { page, limit, total: Number(total) },
+    };
+  }
+
+  /**
    * Insert ticket and initial history in a database transaction
    */
   async createTicketWithInitialHistory(ticketData, userId) {

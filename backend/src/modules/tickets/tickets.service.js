@@ -1,9 +1,20 @@
 import pool from '../../config/db.js';
 import ticketRepository from './tickets.repository.js';
 import { calculateSlaDueAt } from '../../utils/sla.js';
-import { ValidationError, NotFoundError } from '../../utils/errors.js';
+import { ValidationError } from '../../utils/errors.js';
 
 export class TicketService {
+  /**
+   * Daftar tiket (hanya tenant_admin untuk T40)
+   */
+  async getTickets(auth, query) {
+    const tenantId = auth.tenantId;
+    const page  = Math.max(1, parseInt(query.page  ?? 1,  10));
+    const limit = Math.min(50, Math.max(1, parseInt(query.limit ?? 10, 10)));
+
+    return ticketRepository.findByTenantId(tenantId, { page, limit });
+  }
+
   async createTicket(auth, input) {
     const tenantId = auth.tenantId;
 
