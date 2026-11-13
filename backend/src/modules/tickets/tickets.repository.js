@@ -255,6 +255,41 @@ export class TicketRepository {
   }
 
   /**
+   * Update tiket (hanya saat status new)
+   */
+  async updateTicket(ticketId, tenantId, updateData) {
+    const sql = `
+      UPDATE tickets
+      SET
+        customer_id = ?,
+        area_id = ?,
+        odp_id = ?,
+        issue_type_id = ?,
+        priority_id = ?,
+        description = ?,
+        latitude = ?,
+        longitude = ?,
+        updated_at = NOW()
+      WHERE id = ? AND tenant_id = ? AND status = 'new'
+    `;
+
+    const [result] = await pool.query(sql, [
+      updateData.customerId,
+      updateData.areaId,
+      updateData.odpId || null,
+      updateData.issueTypeId,
+      updateData.priorityId,
+      updateData.description,
+      updateData.latitude || null,
+      updateData.longitude || null,
+      ticketId,
+      tenantId,
+    ]);
+
+    return result.affectedRows > 0;
+  }
+
+  /**
    * Insert ticket and initial history in a database transaction
    */
   async createTicketWithInitialHistory(ticketData, userId) {

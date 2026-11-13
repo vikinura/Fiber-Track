@@ -2,6 +2,16 @@ import ticketService from './tickets.service.js';
 import { sendCreated, sendSuccess } from '../../utils/response.js';
 
 export class TicketController {
+  async updateTicket(req, res, next) {
+    try {
+      const ticketId = parseInt(req.params.id, 10);
+      const ticket = await ticketService.updateTicket(req.auth, ticketId, req.body);
+      return sendSuccess(res, ticket);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getTicketById(req, res, next) {
     try {
       const ticketId = parseInt(req.params.id, 10);

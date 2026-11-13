@@ -3,7 +3,7 @@ import ticketController from './tickets.controller.js';
 import { auth } from '../../middlewares/auth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
-import { createTicketSchema } from './tickets.schema.js';
+import { createTicketSchema, updateTicketSchema } from './tickets.schema.js';
 
 const router = Router();
 
@@ -28,6 +28,14 @@ router.get(
   '/:id',
   requireRole('tenant_admin', 'vendor_admin', 'technician'),
   ticketController.getTicketById
+);
+
+// PUT /tickets/:id — update tiket (hanya tenant_admin, hanya saat new)
+router.put(
+  '/:id',
+  requireRole('tenant_admin'),
+  validate(updateTicketSchema),
+  ticketController.updateTicket
 );
 
 // POST /tickets — buat tiket baru
