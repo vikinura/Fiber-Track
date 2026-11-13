@@ -1,18 +1,57 @@
 import pool from '../../config/db.js';
 import ticketRepository from './tickets.repository.js';
-import { calculateSlaDueAt } from '../../utils/sla.js';
+import { calculateSlaDueAt, getSlaStatus } from '../../utils/sla.js';
 import { ValidationError } from '../../utils/errors.js';
 
 export class TicketService {
   /**
-   * Daftar tiket (hanya tenant_admin untuk T40)
+   * Daftar tiket untuk tenant_admin, vendor_admin, atau technician dengan filter & SLA
    */
   async getTickets(auth, query) {
-    const tenantId = auth.tenantId;
     const page  = Math.max(1, parseInt(query.page  ?? 1,  10));
     const limit = Math.min(50, Math.max(1, parseInt(query.limit ?? 10, 10)));
+    const { status, area_id, vendor_id, sla, q } = query;
 
-    return ticketRepository.findByTenantId(tenantId, { page, limit });
+    const result = await ticketRepository.findTickets(auth, {
+      page,
+      limit,
+      status,
+      area_id,
+      vendor_id,
+      q,
+    });
+
+    // Hitung status SLA untuk setiap tiket
+    const dataWithSla = result.data.map(ticket => {
+      const slaInfo = getSlaStatus({
+        createdAt: ticket.created_at,
+        slaDueAt: ticket.sla_due_at,
+        resolvedAt: ticket.resolved_at,
+      });
+      return {
+        ...ticket,
+        sla_status: slaInfo.status,
+        sla_remaining_seconds: slaInfo.remainingSeconds,
+      };
+    });
+
+    // Jika filter sla disediakan (misal 'at_risk', 'overdue', 'on_track')
+    if (sla) {
+      const filtered = dataWithSla.filter(t => t.sla_status === sla);
+      return {
+        data: filtered,
+        meta: {
+          page,
+          limit,
+          total: filtered.length,
+        },
+      };
+    }
+
+    return {
+      data: dataWithSla,
+      meta: result.meta,
+    };
   }
 
   async createTicket(auth, input) {

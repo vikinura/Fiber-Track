@@ -9,10 +9,10 @@ const router = Router();
 
 router.use(auth);
 
-// GET /tickets — daftar tiket (hanya tenant_admin untuk T40; diperluas di T41)
+// GET /tickets — daftar tiket dicakup per peran (tenant_admin, vendor_admin, technician)
 router.get(
   '/',
-  requireRole('tenant_admin'),
+  requireRole('tenant_admin', 'vendor_admin', 'technician'),
   ticketController.getTickets
 );
 

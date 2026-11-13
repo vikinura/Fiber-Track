@@ -35,13 +35,52 @@ export async function generateTicketNo(connection, tenantId, date = new Date()) 
 
 export class TicketRepository {
   /**
-   * Daftar tiket dengan paginasi (hanya tenant_admin – scope tenantId)
-   * @param {number} tenantId
-   * @param {{ page?: number, limit?: number }} opts
-   * @returns {{ data: object[], meta: { page, limit, total } }}
+   * Daftar tiket dengan scoping peran, filter, dan paginasi
+   * @param {{ role: string, tenantId?: number, vendorId?: number, userId?: number }} auth
+   * @param {{ page?: number, limit?: number, status?: string, area_id?: number, vendor_id?: number, q?: string }} filters
    */
-  async findByTenantId(tenantId, { page = 1, limit = 10 } = {}) {
+  async findTickets(auth, { page = 1, limit = 10, status, area_id, vendor_id, q } = {}) {
     const offset = (page - 1) * limit;
+    const conditions = [];
+    const params = [];
+
+    // Role-based scoping
+    if (auth.role === 'tenant_admin') {
+      conditions.push('t.tenant_id = ?');
+      params.push(auth.tenantId);
+
+      // tenant_admin can filter by vendor_id
+      if (vendor_id) {
+        conditions.push('t.vendor_id = ?');
+        params.push(Number(vendor_id));
+      }
+    } else if (auth.role === 'vendor_admin') {
+      conditions.push('t.vendor_id = ?');
+      params.push(auth.vendorId);
+    } else if (auth.role === 'technician') {
+      conditions.push('t.technician_id = ? AND t.vendor_id = ?');
+      params.push(auth.userId, auth.vendorId);
+    } else {
+      // Role lain (misal super_admin) tidak memiliki akses tiket
+      return { data: [], meta: { page, limit, total: 0 } };
+    }
+
+    // Additional filters
+    if (status) {
+      conditions.push('t.status = ?');
+      params.push(status);
+    }
+    if (area_id) {
+      conditions.push('t.area_id = ?');
+      params.push(Number(area_id));
+    }
+    if (q && q.trim()) {
+      const search = `%${q.trim()}%`;
+      conditions.push('(t.ticket_no LIKE ? OR c.name LIKE ?)');
+      params.push(search, search);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     const dataSql = `
       SELECT
@@ -79,22 +118,32 @@ export class TicketRepository {
       LEFT JOIN priorities p  ON p.id  = t.priority_id
       LEFT JOIN vendors    v  ON v.id  = t.vendor_id
       LEFT JOIN users      u  ON u.id  = t.technician_id
-      WHERE t.tenant_id = ?
+      ${whereClause}
       ORDER BY t.created_at DESC
       LIMIT ? OFFSET ?
     `;
 
     const countSql = `
-      SELECT COUNT(*) AS total FROM tickets WHERE tenant_id = ?
+      SELECT COUNT(*) AS total
+      FROM tickets t
+      LEFT JOIN customers c ON c.id = t.customer_id
+      ${whereClause}
     `;
 
-    const [rows] = await pool.query(dataSql, [tenantId, limit, offset]);
-    const [[{ total }]] = await pool.query(countSql, [tenantId]);
+    const [rows] = await pool.query(dataSql, [...params, limit, offset]);
+    const [[{ total }]] = await pool.query(countSql, params);
 
     return {
       data: rows,
       meta: { page, limit, total: Number(total) },
     };
+  }
+
+  /**
+   * Alias lama untuk backward compatibility
+   */
+  async findByTenantId(tenantId, opts = {}) {
+    return this.findTickets({ role: 'tenant_admin', tenantId }, opts);
   }
 
   /**
