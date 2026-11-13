@@ -24,6 +24,7 @@ import '../../features/ticket/domain/usecases/create_ticket.dart';
 import '../../features/ticket/domain/usecases/get_ticket_detail.dart';
 import '../../features/ticket/domain/usecases/get_ticket_histories.dart';
 import '../../features/ticket/domain/usecases/get_tickets.dart';
+import '../../features/ticket/presentation/bloc/ticket_detail_bloc.dart';
 import '../../features/ticket/presentation/bloc/ticket_list_bloc.dart';
 import '../network/dio_client.dart';
 import '../network/token_storage.dart';
@@ -130,5 +131,11 @@ Future<void> initDependencies() async {
   // Ticket Blocs
   getIt.registerFactory<TicketListBloc>(
     () => TicketListBloc(getTickets: getIt<GetTickets>()),
+  );
+  getIt.registerFactory<TicketDetailBloc>(
+    () => TicketDetailBloc(
+      getTicketDetail: getIt<GetTicketDetail>(),
+      getTicketHistories: getIt<GetTicketHistories>(),
+    ),
   );
 }

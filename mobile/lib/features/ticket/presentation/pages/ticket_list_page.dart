@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/injection.dart';
 import '../../../../core/widgets/empty_view.dart';
@@ -297,7 +298,7 @@ class _TicketCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          // Navigasi ke detail tiket (disiapkan untuk T50)
+          context.push('/tickets/${ticket.id}');
         },
         child: Padding(
           padding: const EdgeInsets.all(16),
