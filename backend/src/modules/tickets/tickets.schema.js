@@ -80,3 +80,9 @@ export const forwardTicketSchema = {
     vendor_id: z.coerce.number().int().positive('Vendor wajib dipilih'),
   }),
 };
+
+export const assignTicketSchema = {
+  body: z.object({
+    technician_id: z.coerce.number().int().positive('Teknisi wajib dipilih'),
+  }),
+};

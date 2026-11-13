@@ -255,6 +255,62 @@ export class TicketRepository {
   }
 
   /**
+   * Assign ticket ke teknisi dalam transaksi DB
+   */
+  async assignTicket(ticketId, vendorId, technicianId, userId) {
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    try {
+      // 1. Update status tiket -> 'assigned' & set technician_id
+      const updateSql = `
+        UPDATE tickets
+        SET
+          status = 'assigned',
+          technician_id = ?,
+          updated_at = NOW()
+        WHERE id = ? AND vendor_id = ? AND status = 'forwarded'
+      `;
+      const [updateResult] = await connection.query(updateSql, [
+        technicianId,
+        ticketId,
+        vendorId,
+      ]);
+
+      if (updateResult.affectedRows === 0) {
+        throw new Error('TICKET_NOT_FOUND_OR_INVALID_STATUS');
+      }
+
+      // 2. Ambil nama teknisi untuk catatan riwayat
+      const [uRows] = await connection.query(
+        'SELECT name FROM users WHERE id = ?',
+        [technicianId]
+      );
+      const techName = uRows?.[0]?.name ?? 'Teknisi';
+
+      // 3. Catat riwayat perubahan status
+      const historySql = `
+        INSERT INTO ticket_histories (
+          ticket_id, user_id, from_status, to_status, note, created_at
+        ) VALUES (?, ?, 'forwarded', 'assigned', ?, NOW())
+      `;
+      await connection.query(historySql, [
+        ticketId,
+        userId,
+        `Tiket ditugaskan ke ${techName}`,
+      ]);
+
+      await connection.commit();
+      return true;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
+  /**
    * Forward ticket ke vendor dalam transaksi DB
    */
   async forwardTicket(ticketId, tenantId, vendorId, userId) {

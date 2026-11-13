@@ -7,6 +7,7 @@ import {
   createTicketSchema,
   updateTicketSchema,
   forwardTicketSchema,
+  assignTicketSchema,
 } from './tickets.schema.js';
 
 const router = Router();
@@ -48,6 +49,14 @@ router.patch(
   requireRole('tenant_admin'),
   validate(forwardTicketSchema),
   ticketController.forwardTicket
+);
+
+// PATCH /tickets/:id/assign — tugaskan teknisi (hanya vendor_admin, saat forwarded)
+router.patch(
+  '/:id/assign',
+  requireRole('vendor_admin'),
+  validate(assignTicketSchema),
+  ticketController.assignTicket
 );
 
 // POST /tickets — buat tiket baru

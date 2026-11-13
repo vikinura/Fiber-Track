@@ -5,6 +5,56 @@ import { ValidationError, NotFoundError, ConflictError } from '../../utils/error
 
 export class TicketService {
   /**
+   * Tugaskan teknisi ke tiket (hanya vendor_admin, tiket status 'forwarded', teknisi aktif milik vendor yang sama)
+   */
+  async assignTicket(auth, ticketId, technicianId) {
+    const vendorId = auth.vendorId;
+
+    // 1. Cek keberadaan tiket milik vendor
+    const [tRows] = await pool.query(
+      'SELECT id, status FROM tickets WHERE id = ? AND vendor_id = ?',
+      [ticketId, vendorId]
+    );
+
+    if (!tRows || tRows.length === 0) {
+      throw new NotFoundError('Tiket tidak ditemukan');
+    }
+
+    if (tRows[0].status !== 'forwarded') {
+      throw new ConflictError(
+        `Tiket berstatus '${tRows[0].status}' tidak dapat ditugaskan (hanya tiket berstatus 'forwarded')`
+      );
+    }
+
+    // 2. Cek apakah teknisi aktif, role technician, dan milik vendor yang sama
+    const [techRows] = await pool.query(
+      `SELECT id, name 
+       FROM users 
+       WHERE id = ? AND vendor_id = ? AND role = 'technician' AND is_active = 1`,
+      [technicianId, vendorId]
+    );
+
+    if (!techRows || techRows.length === 0) {
+      throw new ValidationError(
+        'Teknisi tidak valid, tidak aktif, atau bukan anggota dari vendor Anda',
+        [{ field: 'technician_id', message: 'Teknisi tidak valid untuk vendor Anda' }]
+      );
+    }
+
+    // 3. Jalankan transaksi di repository
+    try {
+      await ticketRepository.assignTicket(ticketId, vendorId, technicianId, auth.userId);
+    } catch (err) {
+      if (err.message === 'TICKET_NOT_FOUND_OR_INVALID_STATUS') {
+        throw new ConflictError('Tiket tidak dalam status valid untuk ditugaskan');
+      }
+      throw err;
+    }
+
+    return this.getTicketById(auth, ticketId);
+  }
+
+  /**
    * Teruskan tiket ke vendor (hanya tenant_admin, hanya saat new, vendor harus relasi aktif)
    */
   async forwardTicket(auth, ticketId, vendorId) {
