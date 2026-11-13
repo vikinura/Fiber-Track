@@ -5,6 +5,57 @@ import { ValidationError, NotFoundError, ConflictError } from '../../utils/error
 
 export class TicketService {
   /**
+   * Teruskan tiket ke vendor (hanya tenant_admin, hanya saat new, vendor harus relasi aktif)
+   */
+  async forwardTicket(auth, ticketId, vendorId) {
+    const tenantId = auth.tenantId;
+
+    // 1. Cek keberadaan tiket milik tenant
+    const [tRows] = await pool.query(
+      'SELECT id, status FROM tickets WHERE id = ? AND tenant_id = ?',
+      [ticketId, tenantId]
+    );
+
+    if (!tRows || tRows.length === 0) {
+      throw new NotFoundError('Tiket tidak ditemukan');
+    }
+
+    if (tRows[0].status !== 'new') {
+      throw new ConflictError(
+        `Tiket berstatus '${tRows[0].status}' tidak dapat diteruskan ke vendor (hanya tiket berstatus 'new')`
+      );
+    }
+
+    // 2. Cek apakah vendor aktif dan memiliki relasi aktif di tenant_vendors
+    const [tvRows] = await pool.query(
+      `SELECT tv.vendor_id 
+       FROM tenant_vendors tv
+       JOIN vendors v ON v.id = tv.vendor_id
+       WHERE tv.tenant_id = ? AND tv.vendor_id = ? AND tv.status = 'active' AND v.status = 'active'`,
+      [tenantId, vendorId]
+    );
+
+    if (!tvRows || tvRows.length === 0) {
+      throw new ValidationError(
+        'Vendor tidak valid, tidak aktif, atau tidak bermitra dengan tenant Anda',
+        [{ field: 'vendor_id', message: 'Vendor tidak memiliki kerja sama aktif' }]
+      );
+    }
+
+    // 3. Jalankan transaksi di repository
+    try {
+      await ticketRepository.forwardTicket(ticketId, tenantId, vendorId, auth.userId);
+    } catch (err) {
+      if (err.message === 'TICKET_NOT_FOUND_OR_INVALID_STATUS') {
+        throw new ConflictError('Tiket tidak dalam status valid untuk diteruskan');
+      }
+      throw err;
+    }
+
+    return this.getTicketById(auth, ticketId);
+  }
+
+  /**
    * Update tiket (hanya role tenant_admin, hanya saat status 'new')
    */
   async updateTicket(auth, ticketId, input) {

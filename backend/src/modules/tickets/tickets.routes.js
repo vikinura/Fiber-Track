@@ -3,7 +3,11 @@ import ticketController from './tickets.controller.js';
 import { auth } from '../../middlewares/auth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
-import { createTicketSchema, updateTicketSchema } from './tickets.schema.js';
+import {
+  createTicketSchema,
+  updateTicketSchema,
+  forwardTicketSchema,
+} from './tickets.schema.js';
 
 const router = Router();
 
@@ -36,6 +40,14 @@ router.put(
   requireRole('tenant_admin'),
   validate(updateTicketSchema),
   ticketController.updateTicket
+);
+
+// PATCH /tickets/:id/forward — teruskan tiket ke vendor (hanya tenant_admin, saat new)
+router.patch(
+  '/:id/forward',
+  requireRole('tenant_admin'),
+  validate(forwardTicketSchema),
+  ticketController.forwardTicket
 );
 
 // POST /tickets — buat tiket baru

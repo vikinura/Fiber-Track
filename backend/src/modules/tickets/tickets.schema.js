@@ -74,3 +74,9 @@ export const updateTicketSchema = {
     }
   ),
 };
+
+export const forwardTicketSchema = {
+  body: z.object({
+    vendor_id: z.coerce.number().int().positive('Vendor wajib dipilih'),
+  }),
+};

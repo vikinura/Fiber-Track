@@ -255,6 +255,62 @@ export class TicketRepository {
   }
 
   /**
+   * Forward ticket ke vendor dalam transaksi DB
+   */
+  async forwardTicket(ticketId, tenantId, vendorId, userId) {
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    try {
+      // 1. Update status tiket -> 'forwarded' & set vendor_id
+      const updateSql = `
+        UPDATE tickets
+        SET
+          status = 'forwarded',
+          vendor_id = ?,
+          updated_at = NOW()
+        WHERE id = ? AND tenant_id = ? AND status = 'new'
+      `;
+      const [updateResult] = await connection.query(updateSql, [
+        vendorId,
+        ticketId,
+        tenantId,
+      ]);
+
+      if (updateResult.affectedRows === 0) {
+        throw new Error('TICKET_NOT_FOUND_OR_INVALID_STATUS');
+      }
+
+      // 2. Ambil nama vendor untuk catatan riwayat
+      const [vRows] = await connection.query(
+        'SELECT name FROM vendors WHERE id = ?',
+        [vendorId]
+      );
+      const vendorName = vRows?.[0]?.name ?? 'Vendor';
+
+      // 3. Catat riwayat perubahan status
+      const historySql = `
+        INSERT INTO ticket_histories (
+          ticket_id, user_id, from_status, to_status, note, created_at
+        ) VALUES (?, ?, 'new', 'forwarded', ?, NOW())
+      `;
+      await connection.query(historySql, [
+        ticketId,
+        userId,
+        `Tiket diteruskan ke ${vendorName}`,
+      ]);
+
+      await connection.commit();
+      return true;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
+  /**
    * Update tiket (hanya saat status new)
    */
   async updateTicket(ticketId, tenantId, updateData) {

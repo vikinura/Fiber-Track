@@ -2,6 +2,17 @@ import ticketService from './tickets.service.js';
 import { sendCreated, sendSuccess } from '../../utils/response.js';
 
 export class TicketController {
+  async forwardTicket(req, res, next) {
+    try {
+      const ticketId = parseInt(req.params.id, 10);
+      const { vendor_id } = req.body;
+      const ticket = await ticketService.forwardTicket(req.auth, ticketId, vendor_id);
+      return sendSuccess(res, ticket);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateTicket(req, res, next) {
     try {
       const ticketId = parseInt(req.params.id, 10);
