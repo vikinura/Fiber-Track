@@ -7,7 +7,9 @@ import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/loading_view.dart';
 import '../../../../core/widgets/sla_badge.dart';
 import '../../../../core/widgets/status_chip.dart';
+import '../../domain/entities/sla_status.dart';
 import '../../domain/entities/ticket.dart';
+import '../../domain/entities/ticket_status.dart';
 import '../bloc/ticket_list_bloc.dart';
 import '../bloc/ticket_list_event.dart';
 import '../bloc/ticket_list_state.dart';
@@ -33,6 +35,10 @@ class _TicketListView extends StatefulWidget {
 
 class _TicketListViewState extends State<_TicketListView> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
+
+  String? _selectedStatus;
+  String? _selectedSla;
 
   @override
   void initState() {
@@ -43,6 +49,7 @@ class _TicketListViewState extends State<_TicketListView> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -53,105 +60,223 @@ class _TicketListViewState extends State<_TicketListView> {
     }
   }
 
+  void _applyFilters() {
+    context.read<TicketListBloc>().add(
+      LoadTicketList(
+        status: _selectedStatus,
+        sla: _selectedSla,
+        search: _searchController.text.trim().isNotEmpty
+            ? _searchController.text.trim()
+            : null,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Daftar Tiket Gangguan')),
-      body: BlocBuilder<TicketListBloc, TicketListState>(
-        builder: (context, state) {
-          if (state is TicketListLoading) {
-            return const LoadingView(message: 'Memuat daftar tiket...');
-          }
-
-          if (state is TicketListError) {
-            return ErrorView(
-              message: state.message,
-              onRetry: () {
-                context.read<TicketListBloc>().add(const LoadTicketList());
-              },
-            );
-          }
-
-          if (state is TicketListLoaded) {
-            if (state.tickets.isEmpty) {
-              return RefreshIndicator(
-                onRefresh: () async {
-                  context.read<TicketListBloc>().add(
-                    LoadTicketList(
-                      isRefresh: true,
-                      status: state.status,
-                      areaId: state.areaId,
-                      vendorId: state.vendorId,
-                      sla: state.sla,
-                      search: state.search,
+      body: Column(
+        children: [
+          // Bar Pencarian & Filter
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            color: theme.colorScheme.surface,
+            child: Column(
+              children: [
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Cari nomor tiket atau nama pelanggan...',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              _applyFilters();
+                            },
+                          )
+                        : null,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
                     ),
-                  );
-                },
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      child: EmptyView(
-                        message: 'Belum ada tiket gangguan',
-                        action: TextButton.icon(
-                          onPressed: () {
-                            context.read<TicketListBloc>().add(
-                              const LoadTicketList(),
-                            );
-                          },
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Muat Ulang'),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<TicketListBloc>().add(
-                  LoadTicketList(
-                    isRefresh: true,
-                    status: state.status,
-                    areaId: state.areaId,
-                    vendorId: state.vendorId,
-                    sla: state.sla,
-                    search: state.search,
                   ),
-                );
-              },
-              child: ListView.builder(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                  onSubmitted: (_) => _applyFilters(),
                 ),
-                itemCount: state.hasReachedMax
-                    ? state.tickets.length
-                    : state.tickets.length + 1,
-                itemBuilder: (context, index) {
-                  if (index >= state.tickets.length) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: CircularProgressIndicator(),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      // Filter Status
+                      PopupMenuButton<String?>(
+                        initialValue: _selectedStatus,
+                        onSelected: (val) {
+                          setState(() {
+                            _selectedStatus = val;
+                          });
+                          _applyFilters();
+                        },
+                        child: Chip(
+                          avatar: const Icon(Icons.filter_list, size: 16),
+                          label: Text(
+                            _selectedStatus == null
+                                ? 'Status: Semua'
+                                : 'Status: ${TicketStatus.fromString(_selectedStatus).label}',
+                          ),
+                        ),
+                        itemBuilder: (context) => [
+                          const PopupMenuItem<String?>(
+                            value: null,
+                            child: Text('Semua Status'),
+                          ),
+                          ...TicketStatus.values.map(
+                            (s) => PopupMenuItem<String?>(
+                              value: s.value,
+                              child: Text(s.label),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 8),
+                      // Filter SLA
+                      PopupMenuButton<String?>(
+                        initialValue: _selectedSla,
+                        onSelected: (val) {
+                          setState(() {
+                            _selectedSla = val;
+                          });
+                          _applyFilters();
+                        },
+                        child: Chip(
+                          avatar: const Icon(Icons.timer_outlined, size: 16),
+                          label: Text(
+                            _selectedSla == null
+                                ? 'SLA: Semua'
+                                : 'SLA: ${SlaStatus.fromString(_selectedSla).label}',
+                          ),
+                        ),
+                        itemBuilder: (context) => [
+                          const PopupMenuItem<String?>(
+                            value: null,
+                            child: Text('Semua SLA'),
+                          ),
+                          ...SlaStatus.values.map(
+                            (s) => PopupMenuItem<String?>(
+                              value: s.value,
+                              child: Text(s.label),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (_selectedStatus != null ||
+                          _selectedSla != null ||
+                          _searchController.text.isNotEmpty) ...[
+                        const SizedBox(width: 8),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _selectedStatus = null;
+                              _selectedSla = null;
+                              _searchController.clear();
+                            });
+                            _applyFilters();
+                          },
+                          child: const Text('Reset'),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+
+          // Daftar Tiket
+          Expanded(
+            child: BlocBuilder<TicketListBloc, TicketListState>(
+              builder: (context, state) {
+                if (state is TicketListLoading) {
+                  return const LoadingView(message: 'Memuat daftar tiket...');
+                }
+
+                if (state is TicketListError) {
+                  return ErrorView(
+                    message: state.message,
+                    onRetry: _applyFilters,
+                  );
+                }
+
+                if (state is TicketListLoaded) {
+                  if (state.tickets.isEmpty) {
+                    return RefreshIndicator(
+                      onRefresh: () async => _applyFilters(),
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.5,
+                            child: EmptyView(
+                              message: 'Belum ada tiket yang cocok',
+                              action: TextButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedStatus = null;
+                                    _selectedSla = null;
+                                    _searchController.clear();
+                                  });
+                                  _applyFilters();
+                                },
+                                icon: const Icon(Icons.refresh),
+                                label: const Text('Reset Filter'),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   }
 
-                  final ticket = state.tickets[index];
-                  return _TicketCard(ticket: ticket);
-                },
-              ),
-            );
-          }
+                  return RefreshIndicator(
+                    onRefresh: () async => _applyFilters(),
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      itemCount: state.hasReachedMax
+                          ? state.tickets.length
+                          : state.tickets.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index >= state.tickets.length) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
 
-          return const SizedBox.shrink();
-        },
+                        final ticket = state.tickets[index];
+                        return _TicketCard(ticket: ticket);
+                      },
+                    ),
+                  );
+                }
+
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
