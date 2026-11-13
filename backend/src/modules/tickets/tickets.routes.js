@@ -16,6 +16,20 @@ router.get(
   ticketController.getTickets
 );
 
+// GET /tickets/:id/histories — riwayat perubahan tiket
+router.get(
+  '/:id/histories',
+  requireRole('tenant_admin', 'vendor_admin', 'technician'),
+  ticketController.getTicketHistories
+);
+
+// GET /tickets/:id — detail tiket
+router.get(
+  '/:id',
+  requireRole('tenant_admin', 'vendor_admin', 'technician'),
+  ticketController.getTicketById
+);
+
 // POST /tickets — buat tiket baru
 router.post(
   '/',

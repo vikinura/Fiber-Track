@@ -1,9 +1,43 @@
 import pool from '../../config/db.js';
 import ticketRepository from './tickets.repository.js';
 import { calculateSlaDueAt, getSlaStatus } from '../../utils/sla.js';
-import { ValidationError } from '../../utils/errors.js';
+import { ValidationError, NotFoundError } from '../../utils/errors.js';
 
 export class TicketService {
+  /**
+   * Detail tiket dicakup per peran
+   */
+  async getTicketById(auth, ticketId) {
+    const ticket = await ticketRepository.findById(ticketId, auth);
+    if (!ticket) {
+      throw new NotFoundError('Tiket tidak ditemukan');
+    }
+
+    const slaInfo = getSlaStatus({
+      createdAt: ticket.created_at,
+      slaDueAt: ticket.sla_due_at,
+      resolvedAt: ticket.resolved_at,
+    });
+
+    return {
+      ...ticket,
+      sla_status: slaInfo.status,
+      sla_remaining_seconds: slaInfo.remainingSeconds,
+    };
+  }
+
+  /**
+   * Riwayat tiket (hanya jika tiket dapat diakses oleh peran ini)
+   */
+  async getTicketHistories(auth, ticketId) {
+    const ticket = await ticketRepository.findById(ticketId, auth);
+    if (!ticket) {
+      throw new NotFoundError('Tiket tidak ditemukan');
+    }
+
+    return ticketRepository.findHistoriesByTicketId(ticketId);
+  }
+
   /**
    * Daftar tiket untuk tenant_admin, vendor_admin, atau technician dengan filter & SLA
    */

@@ -140,6 +140,114 @@ export class TicketRepository {
   }
 
   /**
+   * Cari detail tiket berdasarkan ID dengan scoping peran
+   * @param {number} ticketId
+   * @param {{ role: string, tenantId?: number, vendorId?: number, userId?: number }} auth
+   */
+  async findById(ticketId, auth) {
+    const conditions = ['t.id = ?'];
+    const params = [ticketId];
+
+    if (auth.role === 'tenant_admin') {
+      conditions.push('t.tenant_id = ?');
+      params.push(auth.tenantId);
+    } else if (auth.role === 'vendor_admin') {
+      conditions.push('t.vendor_id = ?');
+      params.push(auth.vendorId);
+    } else if (auth.role === 'technician') {
+      conditions.push('t.technician_id = ? AND t.vendor_id = ?');
+      params.push(auth.userId, auth.vendorId);
+    } else {
+      return null;
+    }
+
+    const sql = `
+      SELECT
+        t.id,
+        t.ticket_no,
+        t.status,
+        t.description,
+        t.latitude,
+        t.longitude,
+        t.sla_due_at,
+        t.resolved_at,
+        t.created_at,
+        t.updated_at,
+        t.customer_id,
+        c.name    AS customer_name,
+        c.address AS customer_address,
+        c.phone   AS customer_phone,
+        t.area_id,
+        a.name    AS area_name,
+        t.odp_id,
+        o.code    AS odp_code,
+        t.issue_type_id,
+        it.name   AS issue_type_name,
+        t.priority_id,
+        p.name    AS priority_name,
+        p.sla_hours,
+        t.vendor_id,
+        v.name    AS vendor_name,
+        t.technician_id,
+        u.name    AS technician_name,
+        t.created_by,
+        creator.name AS creator_name
+      FROM tickets t
+      LEFT JOIN customers  c  ON c.id  = t.customer_id
+      LEFT JOIN areas      a  ON a.id  = t.area_id
+      LEFT JOIN odps       o  ON o.id  = t.odp_id
+      LEFT JOIN issue_types it ON it.id = t.issue_type_id
+      LEFT JOIN priorities p  ON p.id  = t.priority_id
+      LEFT JOIN vendors    v  ON v.id  = t.vendor_id
+      LEFT JOIN users      u  ON u.id  = t.technician_id
+      LEFT JOIN users      creator ON creator.id = t.created_by
+      WHERE ${conditions.join(' AND ')}
+      LIMIT 1
+    `;
+
+    const [rows] = await pool.query(sql, params);
+    if (!rows || rows.length === 0) return null;
+
+    const ticket = rows[0];
+
+    // Ambil foto tiket
+    const [photos] = await pool.query(
+      `SELECT id, ticket_id, uploaded_by, file_path, caption, created_at 
+       FROM ticket_photos 
+       WHERE ticket_id = ? 
+       ORDER BY created_at ASC`,
+      [ticketId]
+    );
+    ticket.photos = photos;
+
+    return ticket;
+  }
+
+  /**
+   * Ambil riwayat tiket berdasarkan ticketId
+   */
+  async findHistoriesByTicketId(ticketId) {
+    const sql = `
+      SELECT
+        h.id,
+        h.ticket_id,
+        h.user_id,
+        u.name AS user_name,
+        u.role AS user_role,
+        h.from_status,
+        h.to_status,
+        h.note,
+        h.created_at
+      FROM ticket_histories h
+      LEFT JOIN users u ON u.id = h.user_id
+      WHERE h.ticket_id = ?
+      ORDER BY h.created_at ASC
+    `;
+    const [rows] = await pool.query(sql, [ticketId]);
+    return rows;
+  }
+
+  /**
    * Alias lama untuk backward compatibility
    */
   async findByTenantId(tenantId, opts = {}) {
