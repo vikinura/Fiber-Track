@@ -47,4 +47,15 @@ class AppStrings {
   static const String themeSystem = 'Ikuti Sistem';
   static const String themeLight = 'Mode Terang';
   static const String themeDark = 'Mode Gelap';
+
+  // Navigation & Role Screens
+  static const String navHome = 'Beranda';
+  static const String navTickets = 'Tiket';
+  static const String navSettings = 'Pengaturan';
+  static const String incomingTickets = 'Tiket Masuk';
+  static const String myAssignedTickets = 'Tugas Saya';
+  static const String allTickets = 'Daftar Tiket';
+  static const String tenantHomeTitle = 'Beranda Admin Tenant';
+  static const String vendorHomeTitle = 'Beranda Admin Vendor';
+  static const String technicianHomeTitle = 'Beranda Teknisi';
 }

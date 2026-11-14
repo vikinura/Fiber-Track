@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/auth/presentation/pages/role_home_page.dart';
+import '../../features/auth/presentation/pages/main_navigation_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/ticket/domain/entities/ticket.dart';
 import '../../features/ticket/presentation/pages/ticket_detail_page.dart';
@@ -41,7 +41,7 @@ GoRouter createRouter(AuthBloc authBloc) {
         path: '/',
         builder: (context, state) {
           final authState = authBloc.state;
-          return RoleHomePage(user: authState.user);
+          return MainNavigationPage(user: authState.user);
         },
       ),
       GoRoute(

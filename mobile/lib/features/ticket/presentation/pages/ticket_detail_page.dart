@@ -7,7 +7,14 @@ import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/loading_view.dart';
 import '../../../../core/widgets/sla_badge.dart';
 import '../../../../core/widgets/status_chip.dart';
+import '../../../master/domain/entities/vendor.dart';
+import '../../../master/domain/usecases/get_vendors.dart';
+import '../../../master/domain/usecases/get_technicians.dart';
+import '../../../auth/domain/entities/user.dart';
 import '../../domain/entities/ticket.dart';
+import '../widgets/technician_picker_bottom_sheet.dart';
+import '../widgets/update_status_bottom_sheet.dart';
+import '../widgets/vendor_picker_bottom_sheet.dart';
 import '../../domain/entities/ticket_history.dart';
 import '../../domain/entities/ticket_status.dart';
 import '../bloc/ticket_detail_bloc.dart';
@@ -26,7 +33,26 @@ class TicketDetailPage extends StatelessWidget {
           getIt<TicketDetailBloc>()..add(LoadTicketDetail(ticketId)),
       child: Scaffold(
         appBar: AppBar(title: const Text('Detail Tiket')),
-        body: BlocBuilder<TicketDetailBloc, TicketDetailState>(
+        body: BlocConsumer<TicketDetailBloc, TicketDetailState>(
+          listener: (context, state) {
+            if (state is TicketDetailLoaded) {
+              if (state.actionSuccessMessage != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.actionSuccessMessage!),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else if (state.actionErrorMessage != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.actionErrorMessage!),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
+          },
           builder: (context, state) {
             if (state is TicketDetailLoading) {
               return const LoadingView(message: 'Memuat detail tiket...');
@@ -128,17 +154,161 @@ class _TicketDetailContent extends StatelessWidget {
                 ),
                 if (ticket.status == TicketStatus.newStatus) ...[
                   const Divider(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          context.push(
+                            '/tickets/${ticket.id}/edit',
+                            extra: ticket,
+                          );
+                        },
+                        icon: const Icon(Icons.edit, size: 18),
+                        label: const Text('Edit Tiket'),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          final vendorsResult = await getIt<GetVendors>()
+                              .call();
+                          final vendorList = vendorsResult.fold(
+                            (f) => <Vendor>[],
+                            (v) => v,
+                          );
+                          if (!context.mounted) return;
+
+                          if (vendorList.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Tidak ada vendor aktif yang tersedia',
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          final selected = await VendorPickerBottomSheet.show(
+                            context: context,
+                            vendors: vendorList,
+                          );
+
+                          if (selected != null && context.mounted) {
+                            context.read<TicketDetailBloc>().add(
+                              ForwardTicketEvent(
+                                ticketId: ticket.id,
+                                vendorId: selected.id,
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.send_rounded, size: 18),
+                        label: const Text('Teruskan ke Vendor'),
+                      ),
+                    ],
+                  ),
+                ],
+                if (ticket.status == TicketStatus.forwarded) ...[
+                  const Divider(height: 24),
                   Align(
                     alignment: Alignment.centerRight,
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        context.push(
-                          '/tickets/${ticket.id}/edit',
-                          extra: ticket,
+                    child: FilledButton.icon(
+                      onPressed: () async {
+                        final techResult = await getIt<GetTechnicians>().call();
+                        final techList = techResult.fold(
+                          (f) => <User>[],
+                          (t) => t,
                         );
+                        if (!context.mounted) return;
+
+                        if (techList.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Tidak ada teknisi aktif yang tersedia',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
+                        final selected = await TechnicianPickerBottomSheet.show(
+                          context: context,
+                          technicians: techList,
+                        );
+
+                        if (selected != null && context.mounted) {
+                          context.read<TicketDetailBloc>().add(
+                            AssignTicketEvent(
+                              ticketId: ticket.id,
+                              technicianId: selected.id,
+                            ),
+                          );
+                        }
                       },
-                      icon: const Icon(Icons.edit, size: 18),
-                      label: const Text('Edit Tiket'),
+                      icon: const Icon(Icons.person_add_rounded, size: 18),
+                      label: const Text('Tugaskan Teknisi'),
+                    ),
+                  ),
+                ],
+                if (ticket.status == TicketStatus.assigned) ...[
+                  const Divider(height: 24),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton.icon(
+                      onPressed: () async {
+                        final note = await UpdateStatusBottomSheet.show(
+                          context: context,
+                          currentStatus: ticket.status.value,
+                          nextStatus: 'in_progress',
+                        );
+                        if (note != null && context.mounted) {
+                          context.read<TicketDetailBloc>().add(
+                            UpdateStatusEvent(
+                              ticketId: ticket.id,
+                              toStatus: 'in_progress',
+                              note: note.isNotEmpty ? note : null,
+                            ),
+                          );
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                      ),
+                      icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                      label: const Text('Mulai Pengerjaan'),
+                    ),
+                  ),
+                ],
+                if (ticket.status == TicketStatus.inProgress) ...[
+                  const Divider(height: 24),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton.icon(
+                      onPressed: () async {
+                        final note = await UpdateStatusBottomSheet.show(
+                          context: context,
+                          currentStatus: ticket.status.value,
+                          nextStatus: 'resolved',
+                        );
+                        if (note != null && context.mounted) {
+                          context.read<TicketDetailBloc>().add(
+                            UpdateStatusEvent(
+                              ticketId: ticket.id,
+                              toStatus: 'resolved',
+                              note: note,
+                            ),
+                          );
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                      icon: const Icon(Icons.check_circle_outline, size: 18),
+                      label: const Text('Selesaikan Tiket'),
                     ),
                   ),
                 ],

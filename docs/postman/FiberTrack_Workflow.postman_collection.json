@@ -1,0 +1,226 @@
+{
+	"info": {
+		"_postman_id": "c4d32e5a-8a12-4019-9b99-workflow-core-001",
+		"name": "FiberTrack - Workflow & Status",
+		"description": "Koleksi Postman untuk workflow penugasan vendor/teknisi dan transisi status (Fase 5)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Forward Ticket to Vendor (Tenant Admin)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tenant_admin_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"vendor_id\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/tickets/2/forward",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2", "forward"]
+				}
+			}
+		},
+		{
+			"name": "Assign Ticket to Technician (Vendor Admin)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{vendor_admin_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"technician_id\": 5\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/tickets/2/assign",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2", "assign"]
+				}
+			}
+		},
+		{
+			"name": "Update Status to in_progress (Technician)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{technician_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"to_status\": \"in_progress\",\n  \"note\": \"Teknisi sedang menuju lokasi ODP\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/tickets/2/status",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2", "status"]
+				}
+			}
+		},
+		{
+			"name": "Update Status to resolved (Technician)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{technician_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"to_status\": \"resolved\",\n  \"note\": \"Kabel fiber optik putus telah disambung kembali dengan normal\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/tickets/2/status",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2", "status"]
+				}
+			}
+		},
+		{
+			"name": "Isolation Test 2: Admin tenant teruskan ke vendor tanpa relasi (Expect 422)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tenant_admin_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"vendor_id\": 999\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/tickets/2/forward",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2", "forward"]
+				}
+			}
+		},
+		{
+			"name": "Isolation Test 4: Admin vendor X tugaskan teknisi vendor Y (Expect 422)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{vendor_admin_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"technician_id\": 6\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/tickets/2/assign",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2", "assign"]
+				}
+			}
+		},
+		{
+			"name": "Isolation Test 6: Teknisi ubah status tiket milik orang lain (Expect 404)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{other_technician_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"to_status\": \"in_progress\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/tickets/2/status",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2", "status"]
+				}
+			}
+		},
+		{
+			"name": "Isolation Test 7: Lompat status dari assigned langsung ke resolved (Expect 409)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{technician_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"to_status\": \"resolved\",\n  \"note\": \"Catatan lompat\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/tickets/2/status",
+					"host": ["{{base_url}}"],
+					"path": ["tickets", "2", "status"]
+				}
+			}
+		}
+	]
+}

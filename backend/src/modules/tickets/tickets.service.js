@@ -5,6 +5,160 @@ import { ValidationError, NotFoundError, ConflictError } from '../../utils/error
 
 export class TicketService {
   /**
+   * Update status tiket (hanya role technician, hanya tiket miliknya, sesuai peta transisi)
+   */
+  async updateStatus(auth, ticketId, toStatus, note) {
+    const technicianId = auth.userId;
+    const vendorId = auth.vendorId;
+
+    // 1. Cek keberadaan tiket milik teknisi & vendor
+    const [tRows] = await pool.query(
+      'SELECT id, status FROM tickets WHERE id = ? AND vendor_id = ? AND technician_id = ?',
+      [ticketId, vendorId, technicianId]
+    );
+
+    if (!tRows || tRows.length === 0) {
+      throw new NotFoundError('Tiket tidak ditemukan atau bukan ditugaskan kepada Anda');
+    }
+
+    const currentStatus = tRows[0].status;
+
+    // 2. Validasi peta transisi: assigned -> in_progress -> resolved
+    if (toStatus === 'in_progress' && currentStatus !== 'assigned') {
+      throw new ConflictError(
+        `Tiket berstatus '${currentStatus}' tidak dapat diubah ke 'in_progress' (hanya tiket 'assigned')`
+      );
+    }
+
+    if (toStatus === 'resolved' && currentStatus !== 'in_progress') {
+      throw new ConflictError(
+        `Tiket berstatus '${currentStatus}' tidak dapat diubah ke 'resolved' (hanya tiket 'in_progress')`
+      );
+    }
+
+    // 3. Jalankan repository update & riwayat dalam transaksi
+    try {
+      await ticketRepository.updateTicketStatus(
+        ticketId,
+        vendorId,
+        technicianId,
+        currentStatus,
+        toStatus,
+        note,
+        auth.userId
+      );
+    } catch (err) {
+      if (err.message === 'TICKET_NOT_FOUND_OR_INVALID_STATUS') {
+        throw new ConflictError('Transisi status tiket gagal atau status tiket telah berubah');
+      }
+      throw err;
+    }
+
+    return this.getTicketById(auth, ticketId);
+  }
+
+  /**
+   * Tugaskan teknisi ke tiket (hanya vendor_admin, tiket status 'forwarded', teknisi aktif milik vendor yang sama)
+   */
+  async assignTicket(auth, ticketId, technicianId) {
+    const vendorId = auth.vendorId;
+
+    // 1. Cek keberadaan tiket milik vendor
+    const [tRows] = await pool.query(
+      'SELECT id, status FROM tickets WHERE id = ? AND vendor_id = ?',
+      [ticketId, vendorId]
+    );
+
+    if (!tRows || tRows.length === 0) {
+      throw new NotFoundError('Tiket tidak ditemukan');
+    }
+
+    if (tRows[0].status !== 'forwarded') {
+      throw new ConflictError(
+        `Tiket berstatus '${tRows[0].status}' tidak dapat ditugaskan (hanya tiket berstatus 'forwarded')`
+      );
+    }
+
+    // 2. Cek apakah teknisi aktif, role technician, dan milik vendor yang sama
+    const [techRows] = await pool.query(
+      `SELECT id, name 
+       FROM users 
+       WHERE id = ? AND vendor_id = ? AND role = 'technician' AND is_active = 1`,
+      [technicianId, vendorId]
+    );
+
+    if (!techRows || techRows.length === 0) {
+      throw new ValidationError(
+        'Teknisi tidak valid, tidak aktif, atau bukan anggota dari vendor Anda',
+        [{ field: 'technician_id', message: 'Teknisi tidak valid untuk vendor Anda' }]
+      );
+    }
+
+    // 3. Jalankan transaksi di repository
+    try {
+      await ticketRepository.assignTicket(ticketId, vendorId, technicianId, auth.userId);
+    } catch (err) {
+      if (err.message === 'TICKET_NOT_FOUND_OR_INVALID_STATUS') {
+        throw new ConflictError('Tiket tidak dalam status valid untuk ditugaskan');
+      }
+      throw err;
+    }
+
+    return this.getTicketById(auth, ticketId);
+  }
+
+  /**
+   * Teruskan tiket ke vendor (hanya tenant_admin, hanya saat new, vendor harus relasi aktif)
+   */
+  async forwardTicket(auth, ticketId, vendorId) {
+    const tenantId = auth.tenantId;
+
+    // 1. Cek keberadaan tiket milik tenant
+    const [tRows] = await pool.query(
+      'SELECT id, status FROM tickets WHERE id = ? AND tenant_id = ?',
+      [ticketId, tenantId]
+    );
+
+    if (!tRows || tRows.length === 0) {
+      throw new NotFoundError('Tiket tidak ditemukan');
+    }
+
+    if (tRows[0].status !== 'new') {
+      throw new ConflictError(
+        `Tiket berstatus '${tRows[0].status}' tidak dapat diteruskan ke vendor (hanya tiket berstatus 'new')`
+      );
+    }
+
+    // 2. Cek apakah vendor aktif dan memiliki relasi aktif di tenant_vendors
+    const [tvRows] = await pool.query(
+      `SELECT tv.vendor_id 
+       FROM tenant_vendors tv
+       JOIN vendors v ON v.id = tv.vendor_id
+       WHERE tv.tenant_id = ? AND tv.vendor_id = ? AND tv.status = 'active' AND v.status = 'active'`,
+      [tenantId, vendorId]
+    );
+
+    if (!tvRows || tvRows.length === 0) {
+      throw new ValidationError(
+        'Vendor tidak valid, tidak aktif, atau tidak bermitra dengan tenant Anda',
+        [{ field: 'vendor_id', message: 'Vendor tidak memiliki kerja sama aktif' }]
+      );
+    }
+
+    // 3. Jalankan transaksi di repository
+    try {
+      await ticketRepository.forwardTicket(ticketId, tenantId, vendorId, auth.userId);
+    } catch (err) {
+      if (err.message === 'TICKET_NOT_FOUND_OR_INVALID_STATUS') {
+        throw new ConflictError('Tiket tidak dalam status valid untuk diteruskan');
+      }
+      throw err;
+    }
+
+    return this.getTicketById(auth, ticketId);
+  }
+
+  /**
    * Update tiket (hanya role tenant_admin, hanya saat status 'new')
    */
   async updateTicket(auth, ticketId, input) {
