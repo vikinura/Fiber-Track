@@ -108,3 +108,9 @@ export const updateStatusSchema = {
       }
     ),
 };
+
+export const uploadPhotoSchema = {
+  body: z.object({
+    caption: z.string().trim().max(255, 'Caption maksimal 255 karakter').optional().nullable(),
+  }),
+};

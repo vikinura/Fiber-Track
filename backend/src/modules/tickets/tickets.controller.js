@@ -82,6 +82,17 @@ export class TicketController {
       next(error);
     }
   }
+
+  async uploadPhoto(req, res, next) {
+    try {
+      const ticketId = parseInt(req.params.id, 10);
+      const caption = req.body?.caption || null;
+      const photo = await ticketService.uploadPhoto(req.auth, ticketId, req.file, caption);
+      return sendCreated(res, photo);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new TicketController();
