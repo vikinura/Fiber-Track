@@ -203,4 +203,30 @@ class TicketRepositoryImpl implements TicketRepository {
       return Left(ServerFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, Ticket>> updateTicketStatus({
+    required int ticketId,
+    required String toStatus,
+    String? note,
+  }) async {
+    try {
+      final result = await remoteDataSource.updateTicketStatus(
+        ticketId: ticketId,
+        toStatus: toStatus,
+        note: note,
+      );
+      return Right(result);
+    } on ValidationException catch (e) {
+      return Left(ValidationFailure(message: e.message, errors: e.errors));
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
 }

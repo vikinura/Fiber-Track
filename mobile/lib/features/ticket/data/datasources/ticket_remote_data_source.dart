@@ -48,6 +48,12 @@ abstract class TicketRemoteDataSource {
   Future<TicketModel> forwardTicket(int ticketId, int vendorId);
 
   Future<TicketModel> assignTicket(int ticketId, int technicianId);
+
+  Future<TicketModel> updateTicketStatus({
+    required int ticketId,
+    required String toStatus,
+    String? note,
+  });
 }
 
 class TicketRemoteDataSourceImpl implements TicketRemoteDataSource {
@@ -297,6 +303,45 @@ class TicketRemoteDataSourceImpl implements TicketRemoteDataSource {
       final response = await dioClient.dio.patch(
         '/tickets/$ticketId/assign',
         data: {'technician_id': technicianId},
+      );
+
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is Map<String, dynamic>) {
+        return TicketModel.fromJson(
+          responseData['data'] as Map<String, dynamic>,
+        );
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    } catch (e) {
+      if (e is ServerException ||
+          e is UnauthorizedException ||
+          e is ValidationException ||
+          e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<TicketModel> updateTicketStatus({
+    required int ticketId,
+    required String toStatus,
+    String? note,
+  }) async {
+    try {
+      final payload = <String, dynamic>{'to_status': toStatus};
+      if (note != null && note.trim().isNotEmpty) {
+        payload['note'] = note.trim();
+      }
+
+      final response = await dioClient.dio.patch(
+        '/tickets/$ticketId/status',
+        data: payload,
       );
 
       final responseData = response.data;

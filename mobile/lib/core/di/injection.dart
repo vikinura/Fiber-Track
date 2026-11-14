@@ -25,6 +25,7 @@ import '../../features/ticket/domain/repositories/ticket_repository.dart';
 import '../../features/ticket/domain/usecases/assign_ticket.dart';
 import '../../features/ticket/domain/usecases/create_ticket.dart';
 import '../../features/ticket/domain/usecases/forward_ticket.dart';
+import '../../features/ticket/domain/usecases/update_ticket_status.dart';
 import '../../features/ticket/domain/usecases/get_ticket_detail.dart';
 import '../../features/ticket/domain/usecases/get_ticket_histories.dart';
 import '../../features/ticket/domain/usecases/get_tickets.dart';
@@ -144,6 +145,9 @@ Future<void> initDependencies() async {
   getIt.registerLazySingleton<AssignTicket>(
     () => AssignTicket(getIt<TicketRepository>()),
   );
+  getIt.registerLazySingleton<UpdateTicketStatus>(
+    () => UpdateTicketStatus(getIt<TicketRepository>()),
+  );
 
   // Ticket Blocs
   getIt.registerFactory<TicketListBloc>(
@@ -155,6 +159,7 @@ Future<void> initDependencies() async {
       getTicketHistories: getIt<GetTicketHistories>(),
       forwardTicket: getIt<ForwardTicket>(),
       assignTicket: getIt<AssignTicket>(),
+      updateTicketStatus: getIt<UpdateTicketStatus>(),
     ),
   );
   getIt.registerFactory<TicketFormBloc>(

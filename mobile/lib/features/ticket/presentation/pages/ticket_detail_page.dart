@@ -13,6 +13,7 @@ import '../../../master/domain/usecases/get_technicians.dart';
 import '../../../auth/domain/entities/user.dart';
 import '../../domain/entities/ticket.dart';
 import '../widgets/technician_picker_bottom_sheet.dart';
+import '../widgets/update_status_bottom_sheet.dart';
 import '../widgets/vendor_picker_bottom_sheet.dart';
 import '../../domain/entities/ticket_history.dart';
 import '../../domain/entities/ticket_status.dart';
@@ -248,6 +249,66 @@ class _TicketDetailContent extends StatelessWidget {
                       },
                       icon: const Icon(Icons.person_add_rounded, size: 18),
                       label: const Text('Tugaskan Teknisi'),
+                    ),
+                  ),
+                ],
+                if (ticket.status == TicketStatus.assigned) ...[
+                  const Divider(height: 24),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton.icon(
+                      onPressed: () async {
+                        final note = await UpdateStatusBottomSheet.show(
+                          context: context,
+                          currentStatus: ticket.status.value,
+                          nextStatus: 'in_progress',
+                        );
+                        if (note != null && context.mounted) {
+                          context.read<TicketDetailBloc>().add(
+                            UpdateStatusEvent(
+                              ticketId: ticket.id,
+                              toStatus: 'in_progress',
+                              note: note.isNotEmpty ? note : null,
+                            ),
+                          );
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                      ),
+                      icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                      label: const Text('Mulai Pengerjaan'),
+                    ),
+                  ),
+                ],
+                if (ticket.status == TicketStatus.inProgress) ...[
+                  const Divider(height: 24),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton.icon(
+                      onPressed: () async {
+                        final note = await UpdateStatusBottomSheet.show(
+                          context: context,
+                          currentStatus: ticket.status.value,
+                          nextStatus: 'resolved',
+                        );
+                        if (note != null && context.mounted) {
+                          context.read<TicketDetailBloc>().add(
+                            UpdateStatusEvent(
+                              ticketId: ticket.id,
+                              toStatus: 'resolved',
+                              note: note,
+                            ),
+                          );
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                      icon: const Icon(Icons.check_circle_outline, size: 18),
+                      label: const Text('Selesaikan Tiket'),
                     ),
                   ),
                 ],

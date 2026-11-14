@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/usecases/assign_ticket.dart';
 import '../../domain/usecases/forward_ticket.dart';
+import '../../domain/usecases/update_ticket_status.dart';
 import '../../domain/usecases/get_ticket_detail.dart';
 import '../../domain/usecases/get_ticket_histories.dart';
 import 'ticket_detail_event.dart';
@@ -12,16 +13,19 @@ class TicketDetailBloc extends Bloc<TicketDetailEvent, TicketDetailState> {
   final GetTicketHistories getTicketHistories;
   final ForwardTicket forwardTicket;
   final AssignTicket assignTicket;
+  final UpdateTicketStatus updateTicketStatus;
 
   TicketDetailBloc({
     required this.getTicketDetail,
     required this.getTicketHistories,
     required this.forwardTicket,
     required this.assignTicket,
+    required this.updateTicketStatus,
   }) : super(const TicketDetailInitial()) {
     on<LoadTicketDetail>(_onLoadTicketDetail);
     on<ForwardTicketEvent>(_onForwardTicket);
     on<AssignTicketEvent>(_onAssignTicket);
+    on<UpdateStatusEvent>(_onUpdateStatus);
   }
 
   Future<void> _onLoadTicketDetail(
@@ -118,6 +122,50 @@ class TicketDetailBloc extends Bloc<TicketDetailEvent, TicketDetailState> {
             histories: newHistories,
             isUpdating: false,
             actionSuccessMessage: 'Tiket berhasil ditugaskan ke teknisi',
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onUpdateStatus(
+    UpdateStatusEvent event,
+    Emitter<TicketDetailState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! TicketDetailLoaded) return;
+
+    emit(currentState.copyWith(isUpdating: true));
+
+    final result = await updateTicketStatus(
+      ticketId: event.ticketId,
+      toStatus: event.toStatus,
+      note: event.note,
+    );
+
+    await result.fold(
+      (failure) async {
+        emit(
+          currentState.copyWith(
+            isUpdating: false,
+            actionErrorMessage: failure.message,
+          ),
+        );
+      },
+      (updatedTicket) async {
+        final historiesResult = await getTicketHistories(event.ticketId);
+        final newHistories = historiesResult.fold(
+          (_) => currentState.histories,
+          (h) => h,
+        );
+        emit(
+          TicketDetailLoaded(
+            ticket: updatedTicket,
+            histories: newHistories,
+            isUpdating: false,
+            actionSuccessMessage: event.toStatus == 'resolved'
+                ? 'Tiket berhasil diselesaikan'
+                : 'Pengerjaan tiket telah dimulai',
           ),
         );
       },

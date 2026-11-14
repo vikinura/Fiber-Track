@@ -35,3 +35,18 @@ class AssignTicketEvent extends TicketDetailEvent {
   @override
   List<Object?> get props => [ticketId, technicianId];
 }
+
+class UpdateStatusEvent extends TicketDetailEvent {
+  final int ticketId;
+  final String toStatus;
+  final String? note;
+
+  const UpdateStatusEvent({
+    required this.ticketId,
+    required this.toStatus,
+    this.note,
+  });
+
+  @override
+  List<Object?> get props => [ticketId, toStatus, note];
+}
