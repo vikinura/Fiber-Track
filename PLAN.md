@@ -195,7 +195,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T58** Flutter: use case + data + UI teruskan ke vendor (bottom sheet pemilih vendor). Commit: `feat(ticket): add forward to vendor flow`
 - [x] **T59** Flutter: use case + data + UI tugaskan teknisi. Commit: `feat(ticket): add assign technician flow`
 - [x] **T60** Flutter: form ubah status dengan validasi catatan. Commit: `feat(ticket): add status update flow`
-- [ ] **T61** Beranda per peran: `vendor_admin` (tiket masuk), `technician` (tugas saya) dengan navigasi bawah per peran. Commit: `feat(ticket): add role-based home screens`
+- [x] **T61** Beranda per peran: `vendor_admin` (tiket masuk), `technician` (tugas saya) dengan navigasi bawah per peran. Commit: `feat(ticket): add role-based home screens`
 
 ## Fase 6 - Foto bukti (branch: `feature/ticket-photos`)
 - [ ] **T62** Backend middleware upload (`multer`: tipe, ukuran, nama acak) dan `POST /tickets/:id/photos` (maks 10 foto). Commit: `feat(ticket): add photo upload endpoint`
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-15 - T61 - Beranda per peran (MainNavigationPage dengan NavigationBar dinamis sesuai peran, custom header 'Tiket Masuk'/'Tugas Saya'/'Daftar Tiket', profil peran dinamis) selesai - flutter analyze (0 issue) dan flutter test lolos - Task berikutnya: T62 (Fase 6: Foto bukti).
 
 - 2026-11-15 - T60 - Flutter flow ubah status pengerjaan tiket (use case UpdateTicketStatus, UpdateStatusBottomSheet dengan validasi catatan min 5 karakter saat resolved, aksi Mulai Pengerjaan & Selesaikan Tiket di TicketDetailPage) selesai - flutter analyze (0 issue) dan flutter test lolos - Task berikutnya: T61.
 

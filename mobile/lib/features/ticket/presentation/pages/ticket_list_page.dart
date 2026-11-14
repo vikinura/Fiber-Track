@@ -16,19 +16,25 @@ import '../bloc/ticket_list_event.dart';
 import '../bloc/ticket_list_state.dart';
 
 class TicketListPage extends StatelessWidget {
-  const TicketListPage({super.key});
+  final String? customTitle;
+  final bool showAppBar;
+
+  const TicketListPage({super.key, this.customTitle, this.showAppBar = true});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<TicketListBloc>(
       create: (context) => getIt<TicketListBloc>()..add(const LoadTicketList()),
-      child: const _TicketListView(),
+      child: _TicketListView(customTitle: customTitle, showAppBar: showAppBar),
     );
   }
 }
 
 class _TicketListView extends StatefulWidget {
-  const _TicketListView();
+  final String? customTitle;
+  final bool showAppBar;
+
+  const _TicketListView({this.customTitle, this.showAppBar = true});
 
   @override
   State<_TicketListView> createState() => _TicketListViewState();
@@ -78,21 +84,23 @@ class _TicketListViewState extends State<_TicketListView> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daftar Tiket Gangguan'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_rounded),
-            tooltip: 'Buat Tiket',
-            onPressed: () async {
-              final result = await context.push('/tickets/create');
-              if (result == true && context.mounted) {
-                _applyFilters();
-              }
-            },
-          ),
-        ],
-      ),
+      appBar: widget.showAppBar
+          ? AppBar(
+              title: Text(widget.customTitle ?? 'Daftar Tiket Gangguan'),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.add_rounded),
+                  tooltip: 'Buat Tiket',
+                  onPressed: () async {
+                    final result = await context.push('/tickets/create');
+                    if (result == true && context.mounted) {
+                      _applyFilters();
+                    }
+                  },
+                ),
+              ],
+            )
+          : null,
       body: Column(
         children: [
           // Bar Pencarian & Filter
