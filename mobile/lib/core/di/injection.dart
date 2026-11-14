@@ -17,10 +17,12 @@ import '../../features/master/domain/usecases/get_customers.dart';
 import '../../features/master/domain/usecases/get_issue_types.dart';
 import '../../features/master/domain/usecases/get_odps.dart';
 import '../../features/master/domain/usecases/get_priorities.dart';
+import '../../features/master/domain/usecases/get_technicians.dart';
 import '../../features/master/domain/usecases/get_vendors.dart';
 import '../../features/ticket/data/datasources/ticket_remote_data_source.dart';
 import '../../features/ticket/data/repositories/ticket_repository_impl.dart';
 import '../../features/ticket/domain/repositories/ticket_repository.dart';
+import '../../features/ticket/domain/usecases/assign_ticket.dart';
 import '../../features/ticket/domain/usecases/create_ticket.dart';
 import '../../features/ticket/domain/usecases/forward_ticket.dart';
 import '../../features/ticket/domain/usecases/get_ticket_detail.dart';
@@ -110,6 +112,9 @@ Future<void> initDependencies() async {
   getIt.registerLazySingleton<GetVendors>(
     () => GetVendors(getIt<MasterLookupRepository>()),
   );
+  getIt.registerLazySingleton<GetTechnicians>(
+    () => GetTechnicians(getIt<MasterLookupRepository>()),
+  );
 
   // Ticket Data Sources & Repository
   getIt.registerLazySingleton<TicketRemoteDataSource>(
@@ -136,6 +141,9 @@ Future<void> initDependencies() async {
   getIt.registerLazySingleton<ForwardTicket>(
     () => ForwardTicket(getIt<TicketRepository>()),
   );
+  getIt.registerLazySingleton<AssignTicket>(
+    () => AssignTicket(getIt<TicketRepository>()),
+  );
 
   // Ticket Blocs
   getIt.registerFactory<TicketListBloc>(
@@ -146,6 +154,7 @@ Future<void> initDependencies() async {
       getTicketDetail: getIt<GetTicketDetail>(),
       getTicketHistories: getIt<GetTicketHistories>(),
       forwardTicket: getIt<ForwardTicket>(),
+      assignTicket: getIt<AssignTicket>(),
     ),
   );
   getIt.registerFactory<TicketFormBloc>(

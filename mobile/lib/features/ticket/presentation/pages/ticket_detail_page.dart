@@ -9,7 +9,10 @@ import '../../../../core/widgets/sla_badge.dart';
 import '../../../../core/widgets/status_chip.dart';
 import '../../../master/domain/entities/vendor.dart';
 import '../../../master/domain/usecases/get_vendors.dart';
+import '../../../master/domain/usecases/get_technicians.dart';
+import '../../../auth/domain/entities/user.dart';
 import '../../domain/entities/ticket.dart';
+import '../widgets/technician_picker_bottom_sheet.dart';
 import '../widgets/vendor_picker_bottom_sheet.dart';
 import '../../domain/entities/ticket_history.dart';
 import '../../domain/entities/ticket_status.dart';
@@ -203,6 +206,49 @@ class _TicketDetailContent extends StatelessWidget {
                         label: const Text('Teruskan ke Vendor'),
                       ),
                     ],
+                  ),
+                ],
+                if (ticket.status == TicketStatus.forwarded) ...[
+                  const Divider(height: 24),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton.icon(
+                      onPressed: () async {
+                        final techResult = await getIt<GetTechnicians>().call();
+                        final techList = techResult.fold(
+                          (f) => <User>[],
+                          (t) => t,
+                        );
+                        if (!context.mounted) return;
+
+                        if (techList.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Tidak ada teknisi aktif yang tersedia',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
+                        final selected = await TechnicianPickerBottomSheet.show(
+                          context: context,
+                          technicians: techList,
+                        );
+
+                        if (selected != null && context.mounted) {
+                          context.read<TicketDetailBloc>().add(
+                            AssignTicketEvent(
+                              ticketId: ticket.id,
+                              technicianId: selected.id,
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.person_add_rounded, size: 18),
+                      label: const Text('Tugaskan Teknisi'),
+                    ),
                   ),
                 ],
               ],

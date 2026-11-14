@@ -25,3 +25,13 @@ class ForwardTicketEvent extends TicketDetailEvent {
   @override
   List<Object?> get props => [ticketId, vendorId];
 }
+
+class AssignTicketEvent extends TicketDetailEvent {
+  final int ticketId;
+  final int technicianId;
+
+  const AssignTicketEvent({required this.ticketId, required this.technicianId});
+
+  @override
+  List<Object?> get props => [ticketId, technicianId];
+}

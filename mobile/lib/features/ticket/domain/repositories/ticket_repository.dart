@@ -44,4 +44,6 @@ abstract class TicketRepository {
   });
 
   Future<Either<Failure, Ticket>> forwardTicket(int ticketId, int vendorId);
+
+  Future<Either<Failure, Ticket>> assignTicket(int ticketId, int technicianId);
 }
