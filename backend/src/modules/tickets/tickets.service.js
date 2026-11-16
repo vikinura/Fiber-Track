@@ -474,6 +474,35 @@ export class TicketService {
     const photo = await ticketRepository.addPhoto(ticketId, auth.userId, filePath, caption);
     return photo;
   }
+
+  /**
+   * Sajikan foto bukti dengan pengecekan hak akses tiket
+   */
+  async getPhotoFile(auth, photoId) {
+    const photo = await ticketRepository.findPhotoById(photoId);
+    if (!photo) {
+      throw new NotFoundError('Foto tidak ditemukan');
+    }
+
+    // Role-based authorization scoping to the parent ticket
+    if (auth.role === 'tenant_admin') {
+      if (photo.tenant_id !== auth.tenantId) {
+        throw new NotFoundError('Foto tidak ditemukan');
+      }
+    } else if (auth.role === 'vendor_admin') {
+      if (photo.vendor_id !== auth.vendorId) {
+        throw new NotFoundError('Foto tidak ditemukan');
+      }
+    } else if (auth.role === 'technician') {
+      if (photo.technician_id !== auth.userId || photo.vendor_id !== auth.vendorId) {
+        throw new NotFoundError('Foto tidak ditemukan');
+      }
+    } else {
+      throw new NotFoundError('Foto tidak ditemukan');
+    }
+
+    return photo;
+  }
 }
 
 export default new TicketService();

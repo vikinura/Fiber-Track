@@ -80,6 +80,13 @@ router.post(
   ticketController.uploadPhoto
 );
 
+// GET /tickets/photos/:photoId — sajikan foto bukti dengan akses kontrol tiket
+router.get(
+  '/photos/:photoId',
+  requireRole('tenant_admin', 'vendor_admin', 'technician'),
+  ticketController.getPhoto
+);
+
 // POST /tickets — buat tiket baru
 router.post(
   '/',

@@ -199,7 +199,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 
 ## Fase 6 - Foto bukti (branch: `feature/ticket-photos`)
 - [x] **T62** Backend middleware upload (`multer`: tipe, ukuran, nama acak) dan `POST /tickets/:id/photos` (maks 10 foto). Commit: `feat(ticket): add photo upload endpoint`
-- [ ] **T63** Backend: sajikan foto lewat endpoint berhak akses dan sertakan daftar foto di detail tiket. Commit: `feat(ticket): serve ticket photos with access control`
+- [x] **T63** Backend: sajikan foto lewat endpoint berhak akses dan sertakan daftar foto di detail tiket. Commit: `feat(ticket): serve ticket photos with access control`
 - [ ] **T64** Flutter: pilih foto (`image_picker`), validasi tipe/ukuran, unggah dari detail/form status. Commit: `feat(ticket): add photo picker and upload`
 - [ ] **T65** Flutter: galeri foto di detail (`CachedNetworkImage` dengan header token, placeholder, errorWidget). Commit: `feat(ticket): add photo gallery in detail`
 
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-16 - T63 - Backend endpoint GET /tickets/photos/:photoId dengan proteksi hak akses peran (tenant/vendor/teknisi pemilik) dan penyajian daftar foto lengkap dengan info uploader di detail tiket selesai - Teruji 200 OK untuk tenant pemilik dan 404 isolasi untuk tenant lain - Task berikutnya: T64.
 
 - 2026-11-15 - T62 - Backend upload middleware (multer filter JPG/JPEG/PNG, batas ukuran MAX_UPLOAD_MB, nama unik UUID) dan POST /tickets/:id/photos (guard peran technician/vendor_admin, verifikasi hak akses tiket, batas maksimal 10 foto per tiket) selesai - Teruji 201 Created & DB insert lolos - Task berikutnya: T63.
 

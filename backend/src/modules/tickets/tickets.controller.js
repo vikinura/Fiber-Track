@@ -1,3 +1,7 @@
+import path from 'path';
+import fs from 'fs';
+import { config } from '../../config/env.js';
+import { NotFoundError } from '../../utils/errors.js';
 import ticketService from './tickets.service.js';
 import { sendCreated, sendSuccess } from '../../utils/response.js';
 
@@ -89,6 +93,24 @@ export class TicketController {
       const caption = req.body?.caption || null;
       const photo = await ticketService.uploadPhoto(req.auth, ticketId, req.file, caption);
       return sendCreated(res, photo);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getPhoto(req, res, next) {
+    try {
+      const photoId = parseInt(req.params.photoId, 10);
+      const photo = await ticketService.getPhotoFile(req.auth, photoId);
+      
+      const uploadDir = path.resolve(process.cwd(), config.upload.dir);
+      const fullPath = path.resolve(uploadDir, photo.file_path);
+
+      if (!fs.existsSync(fullPath)) {
+        return next(new NotFoundError('File foto tidak ditemukan di server'));
+      }
+
+      return res.sendFile(fullPath);
     } catch (error) {
       next(error);
     }
