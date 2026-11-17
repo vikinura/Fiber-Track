@@ -426,7 +426,17 @@ export class TicketService {
       auth.userId
     );
 
-    return ticket;
+    const slaInfo = getSlaStatus({
+      createdAt: ticket.created_at,
+      slaDueAt: ticket.sla_due_at,
+      resolvedAt: ticket.resolved_at,
+    });
+
+    return {
+      ...ticket,
+      sla_status: slaInfo.status,
+      sla_remaining_seconds: slaInfo.remainingSeconds,
+    };
   }
 
   /**

@@ -204,7 +204,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T65** Flutter: galeri foto di detail (`CachedNetworkImage` dengan header token, placeholder, errorWidget). Commit: `feat(ticket): add photo gallery in detail`
 
 ## Fase 7 - SLA dan notifikasi (branch: `feature/sla-notifications`)
-- [ ] **T66** Backend: sertakan `sla_status` dan sisa waktu di respons daftar dan detail tiket. Commit: `feat(sla): include sla status in ticket responses`
+- [x] **T66** Backend: sertakan `sla_status` dan sisa waktu di respons daftar dan detail tiket. Commit: `feat(sla): include sla status in ticket responses`
 - [ ] **T67** Backend: tulis notifikasi di dalam transaksi forward, assign, dan `resolved`. Commit: `feat(notification): create notifications on workflow events`
 - [ ] **T68** Backend `GET /notifications` dan `PATCH /notifications/:id/read`. Commit: `feat(notification): add notification endpoints`
 - [ ] **T69** Flutter notifikasi: domain + data + bloc + halaman + badge di navigasi, polling 30-60 detik dan saat aplikasi dibuka kembali. Commit: `feat(notification): add notification feature with polling`
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-17 - T66 - Backend perhitungan SLA dinamis (getSlaStatus: on_track, at_risk, overdue, met, breached) serta properti sla_status dan sla_remaining_seconds di seluruh respons daftar, detail, dan pembuatan tiket selesai - Teruji endpoint mengembalikan sla_status dan sla_remaining_seconds akurat - Task berikutnya: T67.
 
 - 2026-11-17 - T65 - Flutter galeri foto di detail tiket (TicketPhotoGallery dengan CachedNetworkImage, header token Authorization, placeholder, errorWidget, preview modal dialog dengan caption, dan batasan kuota 10 foto) selesai - flutter analyze (0 issue) dan test lolos - Task berikutnya: T66 (Fase 7: SLA dan notifikasi).
 
