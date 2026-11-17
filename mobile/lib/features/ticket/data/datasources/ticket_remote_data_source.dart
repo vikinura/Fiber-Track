@@ -6,6 +6,7 @@ import '../../../../core/network/dio_client.dart';
 import '../../../../core/network/error_mapper.dart';
 import '../models/ticket_history_model.dart';
 import '../models/ticket_model.dart';
+import '../models/ticket_photo_model.dart';
 
 abstract class TicketRemoteDataSource {
   Future<PaginatedResult<TicketModel>> getTickets({
@@ -53,6 +54,12 @@ abstract class TicketRemoteDataSource {
     required int ticketId,
     required String toStatus,
     String? note,
+  });
+
+  Future<TicketPhotoModel> uploadPhoto({
+    required int ticketId,
+    required String filePath,
+    String? caption,
   });
 }
 
@@ -349,6 +356,47 @@ class TicketRemoteDataSourceImpl implements TicketRemoteDataSource {
           responseData['success'] == true &&
           responseData['data'] is Map<String, dynamic>) {
         return TicketModel.fromJson(
+          responseData['data'] as Map<String, dynamic>,
+        );
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    } catch (e) {
+      if (e is ServerException ||
+          e is UnauthorizedException ||
+          e is ValidationException ||
+          e is NetworkException) {
+        rethrow;
+      }
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<TicketPhotoModel> uploadPhoto({
+    required int ticketId,
+    required String filePath,
+    String? caption,
+  }) async {
+    try {
+      final fileName = filePath.split(RegExp(r'[/\\]')).last;
+      final formData = FormData.fromMap({
+        'photo': await MultipartFile.fromFile(filePath, filename: fileName),
+        if (caption != null && caption.trim().isNotEmpty)
+          'caption': caption.trim(),
+      });
+
+      final response = await dioClient.dio.post(
+        '/tickets/$ticketId/photos',
+        data: formData,
+      );
+
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is Map<String, dynamic>) {
+        return TicketPhotoModel.fromJson(
           responseData['data'] as Map<String, dynamic>,
         );
       }

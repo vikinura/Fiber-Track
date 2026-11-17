@@ -50,3 +50,18 @@ class UpdateStatusEvent extends TicketDetailEvent {
   @override
   List<Object?> get props => [ticketId, toStatus, note];
 }
+
+class UploadPhotoEvent extends TicketDetailEvent {
+  final int ticketId;
+  final String filePath;
+  final String? caption;
+
+  const UploadPhotoEvent({
+    required this.ticketId,
+    required this.filePath,
+    this.caption,
+  });
+
+  @override
+  List<Object?> get props => [ticketId, filePath, caption];
+}
