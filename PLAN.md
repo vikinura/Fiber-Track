@@ -201,7 +201,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T62** Backend middleware upload (`multer`: tipe, ukuran, nama acak) dan `POST /tickets/:id/photos` (maks 10 foto). Commit: `feat(ticket): add photo upload endpoint`
 - [x] **T63** Backend: sajikan foto lewat endpoint berhak akses dan sertakan daftar foto di detail tiket. Commit: `feat(ticket): serve ticket photos with access control`
 - [x] **T64** Flutter: pilih foto (`image_picker`), validasi tipe/ukuran, unggah dari detail/form status. Commit: `feat(ticket): add photo picker and upload`
-- [ ] **T65** Flutter: galeri foto di detail (`CachedNetworkImage` dengan header token, placeholder, errorWidget). Commit: `feat(ticket): add photo gallery in detail`
+- [x] **T65** Flutter: galeri foto di detail (`CachedNetworkImage` dengan header token, placeholder, errorWidget). Commit: `feat(ticket): add photo gallery in detail`
 
 ## Fase 7 - SLA dan notifikasi (branch: `feature/sla-notifications`)
 - [ ] **T66** Backend: sertakan `sla_status` dan sisa waktu di respons daftar dan detail tiket. Commit: `feat(sla): include sla status in ticket responses`
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-17 - T65 - Flutter galeri foto di detail tiket (TicketPhotoGallery dengan CachedNetworkImage, header token Authorization, placeholder, errorWidget, preview modal dialog dengan caption, dan batasan kuota 10 foto) selesai - flutter analyze (0 issue) dan test lolos - Task berikutnya: T66 (Fase 7: SLA dan notifikasi).
 
 - 2026-11-17 - T64 - Flutter pemilih dan unggah foto (UploadTicketPhoto use case, UploadPhotoBottomSheet dengan image_picker, validasi ekstensi JPG/PNG & batas 5 MB, upload multipart via TicketRemoteDataSource, integrasi tombol di TicketDetailPage & TicketDetailBloc) selesai - flutter analyze (0 issue) dan test lolos - Task berikutnya: T65.
 

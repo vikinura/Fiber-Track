@@ -13,6 +13,7 @@ import '../../../master/domain/usecases/get_technicians.dart';
 import '../../../auth/domain/entities/user.dart';
 import '../../domain/entities/ticket.dart';
 import '../widgets/technician_picker_bottom_sheet.dart';
+import '../widgets/ticket_photo_gallery.dart';
 import '../widgets/update_status_bottom_sheet.dart';
 import '../widgets/upload_photo_bottom_sheet.dart';
 import '../widgets/vendor_picker_bottom_sheet.dart';
@@ -495,6 +496,30 @@ class _TicketDetailContent extends StatelessWidget {
               ],
             ),
           ),
+        ),
+        const SizedBox(height: 16),
+
+        // Galeri Foto Bukti
+        TicketPhotoGallery(
+          photos: ticket.photos,
+          canUpload:
+              ticket.status == TicketStatus.assigned ||
+              ticket.status == TicketStatus.inProgress,
+          onAddPhotoPressed: () {
+            UploadPhotoBottomSheet.show(
+              context: context,
+              ticketId: ticket.id,
+              onUpload: (filePath, caption) {
+                context.read<TicketDetailBloc>().add(
+                  UploadPhotoEvent(
+                    ticketId: ticket.id,
+                    filePath: filePath,
+                    caption: caption,
+                  ),
+                );
+              },
+            );
+          },
         ),
         const SizedBox(height: 16),
 
