@@ -51,11 +51,16 @@ class SlaBadge extends StatelessWidget {
     }
 
     String labelText = slaStatus.label;
-    if (remainingSeconds != null &&
-        (slaStatus == SlaStatus.onTrack ||
-            slaStatus == SlaStatus.atRisk ||
-            slaStatus == SlaStatus.overdue)) {
-      labelText = '$labelText (${_formatRemaining(remainingSeconds!)})';
+    if (remainingSeconds != null && remainingSeconds != 0) {
+      if (slaStatus == SlaStatus.onTrack ||
+          slaStatus == SlaStatus.atRisk ||
+          slaStatus == SlaStatus.overdue) {
+        final prefix = slaStatus == SlaStatus.overdue ? 'Telat ' : 'Sisa ';
+        labelText =
+            '$labelText ($prefix${_formatRemaining(remainingSeconds!)})';
+      } else if (slaStatus == SlaStatus.breached) {
+        labelText = '$labelText (Telat ${_formatRemaining(remainingSeconds!)})';
+      }
     }
 
     return Container(
