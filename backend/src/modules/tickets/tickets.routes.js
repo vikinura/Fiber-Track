@@ -3,12 +3,14 @@ import ticketController from './tickets.controller.js';
 import { auth } from '../../middlewares/auth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
+import { uploadPhotoMiddleware, handleMulterError } from '../../middlewares/upload.js';
 import {
   createTicketSchema,
   updateTicketSchema,
   forwardTicketSchema,
   assignTicketSchema,
   updateStatusSchema,
+  uploadPhotoSchema,
 } from './tickets.schema.js';
 
 const router = Router();
@@ -66,6 +68,23 @@ router.patch(
   requireRole('technician'),
   validate(updateStatusSchema),
   ticketController.updateStatus
+);
+
+// POST /tickets/:id/photos — upload foto bukti (technician atau vendor_admin)
+router.post(
+  '/:id/photos',
+  requireRole('technician', 'vendor_admin'),
+  uploadPhotoMiddleware.single('photo'),
+  handleMulterError,
+  validate(uploadPhotoSchema),
+  ticketController.uploadPhoto
+);
+
+// GET /tickets/photos/:photoId — sajikan foto bukti dengan akses kontrol tiket
+router.get(
+  '/photos/:photoId',
+  requireRole('tenant_admin', 'vendor_admin', 'technician'),
+  ticketController.getPhoto
 );
 
 // POST /tickets — buat tiket baru

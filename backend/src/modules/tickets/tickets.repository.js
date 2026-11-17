@@ -210,12 +210,21 @@ export class TicketRepository {
 
     const ticket = rows[0];
 
-    // Ambil foto tiket
+    // Ambil foto tiket beserta info pengunggah
     const [photos] = await pool.query(
-      `SELECT id, ticket_id, uploaded_by, file_path, caption, created_at 
-       FROM ticket_photos 
-       WHERE ticket_id = ? 
-       ORDER BY created_at ASC`,
+      `SELECT 
+         tp.id, 
+         tp.ticket_id, 
+         tp.uploaded_by, 
+         u.name AS uploader_name,
+         u.role AS uploader_role,
+         tp.file_path, 
+         tp.caption, 
+         tp.created_at 
+       FROM ticket_photos tp
+       LEFT JOIN users u ON u.id = tp.uploaded_by
+       WHERE tp.ticket_id = ? 
+       ORDER BY tp.created_at ASC`,
       [ticketId]
     );
     ticket.photos = photos;
@@ -514,6 +523,59 @@ export class TicketRepository {
     } finally {
       connection.release();
     }
+  }
+
+  /**
+   * Hitung jumlah foto tiket
+   */
+  async countPhotosByTicketId(ticketId) {
+    const [rows] = await pool.query(
+      `SELECT COUNT(*) AS total FROM ticket_photos WHERE ticket_id = ?`,
+      [ticketId]
+    );
+    return rows[0]?.total || 0;
+  }
+
+  /**
+   * Simpan foto tiket baru
+   */
+  async addPhoto(ticketId, userId, filePath, caption = null) {
+    const [result] = await pool.query(
+      `INSERT INTO ticket_photos (ticket_id, uploaded_by, file_path, caption, created_at)
+       VALUES (?, ?, ?, ?, NOW())`,
+      [ticketId, userId, filePath, caption]
+    );
+
+    const [rows] = await pool.query(
+      `SELECT id, ticket_id, uploaded_by, file_path, caption, created_at
+       FROM ticket_photos
+       WHERE id = ?`,
+      [result.insertId]
+    );
+    return rows[0];
+  }
+
+  /**
+   * Ambil detail satu foto tiket berdasarkan id foto beserta ticket info
+   */
+  async findPhotoById(photoId) {
+    const [rows] = await pool.query(
+      `SELECT 
+         tp.id, 
+         tp.ticket_id, 
+         tp.uploaded_by, 
+         tp.file_path, 
+         tp.caption, 
+         tp.created_at,
+         t.tenant_id,
+         t.vendor_id,
+         t.technician_id
+       FROM ticket_photos tp
+       JOIN tickets t ON t.id = tp.ticket_id
+       WHERE tp.id = ?`,
+      [photoId]
+    );
+    return rows[0] || null;
   }
 }
 

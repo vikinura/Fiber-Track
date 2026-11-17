@@ -4,6 +4,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/models/paginated_result.dart';
 import '../entities/ticket.dart';
 import '../entities/ticket_history.dart';
+import '../entities/ticket_photo.dart';
 
 abstract class TicketRepository {
   Future<Either<Failure, PaginatedResult<Ticket>>> getTickets({
@@ -51,5 +52,11 @@ abstract class TicketRepository {
     required int ticketId,
     required String toStatus,
     String? note,
+  });
+
+  Future<Either<Failure, TicketPhoto>> uploadPhoto({
+    required int ticketId,
+    required String filePath,
+    String? caption,
   });
 }

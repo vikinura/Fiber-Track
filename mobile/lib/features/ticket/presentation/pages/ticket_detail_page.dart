@@ -13,7 +13,9 @@ import '../../../master/domain/usecases/get_technicians.dart';
 import '../../../auth/domain/entities/user.dart';
 import '../../domain/entities/ticket.dart';
 import '../widgets/technician_picker_bottom_sheet.dart';
+import '../widgets/ticket_photo_gallery.dart';
 import '../widgets/update_status_bottom_sheet.dart';
+import '../widgets/upload_photo_bottom_sheet.dart';
 import '../widgets/vendor_picker_bottom_sheet.dart';
 import '../../domain/entities/ticket_history.dart';
 import '../../domain/entities/ticket_status.dart';
@@ -254,62 +256,106 @@ class _TicketDetailContent extends StatelessWidget {
                 ],
                 if (ticket.status == TicketStatus.assigned) ...[
                   const Divider(height: 24),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: FilledButton.icon(
-                      onPressed: () async {
-                        final note = await UpdateStatusBottomSheet.show(
-                          context: context,
-                          currentStatus: ticket.status.value,
-                          nextStatus: 'in_progress',
-                        );
-                        if (note != null && context.mounted) {
-                          context.read<TicketDetailBloc>().add(
-                            UpdateStatusEvent(
-                              ticketId: ticket.id,
-                              toStatus: 'in_progress',
-                              note: note.isNotEmpty ? note : null,
-                            ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          UploadPhotoBottomSheet.show(
+                            context: context,
+                            ticketId: ticket.id,
+                            onUpload: (filePath, caption) {
+                              context.read<TicketDetailBloc>().add(
+                                UploadPhotoEvent(
+                                  ticketId: ticket.id,
+                                  filePath: filePath,
+                                  caption: caption,
+                                ),
+                              );
+                            },
                           );
-                        }
-                      },
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white,
+                        },
+                        icon: const Icon(Icons.add_a_photo_outlined, size: 18),
+                        label: const Text('Unggah Foto'),
                       ),
-                      icon: const Icon(Icons.play_arrow_rounded, size: 18),
-                      label: const Text('Mulai Pengerjaan'),
-                    ),
+                      const SizedBox(width: 8),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          final note = await UpdateStatusBottomSheet.show(
+                            context: context,
+                            currentStatus: ticket.status.value,
+                            nextStatus: 'in_progress',
+                          );
+                          if (note != null && context.mounted) {
+                            context.read<TicketDetailBloc>().add(
+                              UpdateStatusEvent(
+                                ticketId: ticket.id,
+                                toStatus: 'in_progress',
+                                note: note.isNotEmpty ? note : null,
+                              ),
+                            );
+                          }
+                        },
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                        ),
+                        icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                        label: const Text('Mulai Pengerjaan'),
+                      ),
+                    ],
                   ),
                 ],
                 if (ticket.status == TicketStatus.inProgress) ...[
                   const Divider(height: 24),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: FilledButton.icon(
-                      onPressed: () async {
-                        final note = await UpdateStatusBottomSheet.show(
-                          context: context,
-                          currentStatus: ticket.status.value,
-                          nextStatus: 'resolved',
-                        );
-                        if (note != null && context.mounted) {
-                          context.read<TicketDetailBloc>().add(
-                            UpdateStatusEvent(
-                              ticketId: ticket.id,
-                              toStatus: 'resolved',
-                              note: note,
-                            ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          UploadPhotoBottomSheet.show(
+                            context: context,
+                            ticketId: ticket.id,
+                            onUpload: (filePath, caption) {
+                              context.read<TicketDetailBloc>().add(
+                                UploadPhotoEvent(
+                                  ticketId: ticket.id,
+                                  filePath: filePath,
+                                  caption: caption,
+                                ),
+                              );
+                            },
                           );
-                        }
-                      },
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
+                        },
+                        icon: const Icon(Icons.add_a_photo_outlined, size: 18),
+                        label: const Text('Unggah Foto'),
                       ),
-                      icon: const Icon(Icons.check_circle_outline, size: 18),
-                      label: const Text('Selesaikan Tiket'),
-                    ),
+                      const SizedBox(width: 8),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          final note = await UpdateStatusBottomSheet.show(
+                            context: context,
+                            currentStatus: ticket.status.value,
+                            nextStatus: 'resolved',
+                          );
+                          if (note != null && context.mounted) {
+                            context.read<TicketDetailBloc>().add(
+                              UpdateStatusEvent(
+                                ticketId: ticket.id,
+                                toStatus: 'resolved',
+                                note: note,
+                              ),
+                            );
+                          }
+                        },
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                        icon: const Icon(Icons.check_circle_outline, size: 18),
+                        label: const Text('Selesaikan Tiket'),
+                      ),
+                    ],
                   ),
                 ],
               ],
@@ -450,6 +496,30 @@ class _TicketDetailContent extends StatelessWidget {
               ],
             ),
           ),
+        ),
+        const SizedBox(height: 16),
+
+        // Galeri Foto Bukti
+        TicketPhotoGallery(
+          photos: ticket.photos,
+          canUpload:
+              ticket.status == TicketStatus.assigned ||
+              ticket.status == TicketStatus.inProgress,
+          onAddPhotoPressed: () {
+            UploadPhotoBottomSheet.show(
+              context: context,
+              ticketId: ticket.id,
+              onUpload: (filePath, caption) {
+                context.read<TicketDetailBloc>().add(
+                  UploadPhotoEvent(
+                    ticketId: ticket.id,
+                    filePath: filePath,
+                    caption: caption,
+                  ),
+                );
+              },
+            );
+          },
         ),
         const SizedBox(height: 16),
 

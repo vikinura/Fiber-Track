@@ -5,6 +5,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/models/paginated_result.dart';
 import '../../domain/entities/ticket.dart';
 import '../../domain/entities/ticket_history.dart';
+import '../../domain/entities/ticket_photo.dart';
 import '../../domain/repositories/ticket_repository.dart';
 import '../datasources/ticket_remote_data_source.dart';
 
@@ -215,6 +216,32 @@ class TicketRepositoryImpl implements TicketRepository {
         ticketId: ticketId,
         toStatus: toStatus,
         note: note,
+      );
+      return Right(result);
+    } on ValidationException catch (e) {
+      return Left(ValidationFailure(message: e.message, errors: e.errors));
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, TicketPhoto>> uploadPhoto({
+    required int ticketId,
+    required String filePath,
+    String? caption,
+  }) async {
+    try {
+      final result = await remoteDataSource.uploadPhoto(
+        ticketId: ticketId,
+        filePath: filePath,
+        caption: caption,
       );
       return Right(result);
     } on ValidationException catch (e) {

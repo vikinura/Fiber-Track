@@ -428,6 +428,81 @@ export class TicketService {
 
     return ticket;
   }
+
+  /**
+   * Upload foto bukti tiket
+   * Hanya diizinkan untuk technician (hanya tiket miliknya) dan vendor_admin (tiket milik vendornya)
+   * Maksimal 10 foto per tiket
+   */
+  async uploadPhoto(auth, ticketId, file, caption = null) {
+    if (!file) {
+      throw new ValidationError('File foto wajib diunggah', [
+        { field: 'photo', message: 'File foto tidak ditemukan' },
+      ]);
+    }
+
+    // 1. Cek hak akses ke tiket
+    const ticket = await ticketRepository.findById(ticketId, auth);
+    if (!ticket) {
+      throw new NotFoundError('Tiket tidak ditemukan atau di luar cakupan akses');
+    }
+
+    // Hak akses: technician hanya tiket miliknya; vendor_admin tiket vendornya
+    if (auth.role === 'technician') {
+      if (ticket.technician_id !== auth.userId) {
+        throw new NotFoundError('Tiket tidak ditemukan atau di luar cakupan akses');
+      }
+    } else if (auth.role === 'vendor_admin') {
+      if (ticket.vendor_id !== auth.vendorId) {
+        throw new NotFoundError('Tiket tidak ditemukan atau di luar cakupan akses');
+      }
+    } else {
+      throw new NotFoundError('Tiket tidak ditemukan atau di luar cakupan akses');
+    }
+
+    // 2. Cek kuota maks 10 foto per tiket
+    const currentPhotoCount = await ticketRepository.countPhotosByTicketId(ticketId);
+    if (currentPhotoCount >= 10) {
+      throw new ValidationError('Maksimal 10 foto per tiket sudah tercapai', [
+        { field: 'photo', message: 'Tiket sudah memiliki batas maksimal 10 foto' },
+      ]);
+    }
+
+    // 3. Simpan relasi foto
+    // file_path disimpan relatif terhadap folder upload (mis: filename)
+    const filePath = file.filename;
+    const photo = await ticketRepository.addPhoto(ticketId, auth.userId, filePath, caption);
+    return photo;
+  }
+
+  /**
+   * Sajikan foto bukti dengan pengecekan hak akses tiket
+   */
+  async getPhotoFile(auth, photoId) {
+    const photo = await ticketRepository.findPhotoById(photoId);
+    if (!photo) {
+      throw new NotFoundError('Foto tidak ditemukan');
+    }
+
+    // Role-based authorization scoping to the parent ticket
+    if (auth.role === 'tenant_admin') {
+      if (photo.tenant_id !== auth.tenantId) {
+        throw new NotFoundError('Foto tidak ditemukan');
+      }
+    } else if (auth.role === 'vendor_admin') {
+      if (photo.vendor_id !== auth.vendorId) {
+        throw new NotFoundError('Foto tidak ditemukan');
+      }
+    } else if (auth.role === 'technician') {
+      if (photo.technician_id !== auth.userId || photo.vendor_id !== auth.vendorId) {
+        throw new NotFoundError('Foto tidak ditemukan');
+      }
+    } else {
+      throw new NotFoundError('Foto tidak ditemukan');
+    }
+
+    return photo;
+  }
 }
 
 export default new TicketService();

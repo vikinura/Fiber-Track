@@ -14,6 +14,7 @@ class AppTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final int maxLines;
+  final int? maxLength;
   final bool enabled;
 
   const AppTextField({
@@ -31,6 +32,7 @@ class AppTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.maxLines = 1,
+    this.maxLength,
     this.enabled = true,
   });
 
@@ -44,6 +46,7 @@ class AppTextField extends StatelessWidget {
       validator: validator,
       onChanged: onChanged,
       maxLines: maxLines,
+      maxLength: maxLength,
       enabled: enabled,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
