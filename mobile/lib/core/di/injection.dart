@@ -33,6 +33,12 @@ import '../../features/ticket/domain/usecases/upload_ticket_photo.dart';
 import '../../features/ticket/presentation/bloc/ticket_detail_bloc.dart';
 import '../../features/ticket/presentation/bloc/ticket_form_bloc.dart';
 import '../../features/ticket/presentation/bloc/ticket_list_bloc.dart';
+import '../../features/notification/data/datasources/notification_remote_data_source.dart';
+import '../../features/notification/data/repositories/notification_repository_impl.dart';
+import '../../features/notification/domain/repositories/notification_repository.dart';
+import '../../features/notification/domain/usecases/get_notifications.dart';
+import '../../features/notification/domain/usecases/mark_notification_as_read.dart';
+import '../../features/notification/presentation/bloc/notification_bloc.dart';
 import '../network/dio_client.dart';
 import '../network/token_storage.dart';
 import '../theme/theme_cubit.dart';
@@ -175,6 +181,32 @@ Future<void> initDependencies() async {
       getPriorities: getIt<GetPriorities>(),
       createTicket: getIt<CreateTicket>(),
       ticketRepository: getIt<TicketRepository>(),
+    ),
+  );
+
+  // Notification Data Sources & Repository
+  getIt.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(dioClient: getIt<DioClient>()),
+  );
+  getIt.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(
+      remoteDataSource: getIt<NotificationRemoteDataSource>(),
+    ),
+  );
+
+  // Notification Use Cases
+  getIt.registerLazySingleton<GetNotifications>(
+    () => GetNotifications(getIt<NotificationRepository>()),
+  );
+  getIt.registerLazySingleton<MarkNotificationAsRead>(
+    () => MarkNotificationAsRead(getIt<NotificationRepository>()),
+  );
+
+  // Notification Bloc
+  getIt.registerFactory<NotificationBloc>(
+    () => NotificationBloc(
+      getNotifications: getIt<GetNotifications>(),
+      markNotificationAsRead: getIt<MarkNotificationAsRead>(),
     ),
   );
 }

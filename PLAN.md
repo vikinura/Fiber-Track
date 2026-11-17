@@ -207,7 +207,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T66** Backend: sertakan `sla_status` dan sisa waktu di respons daftar dan detail tiket. Commit: `feat(sla): include sla status in ticket responses`
 - [x] **T67** Backend: tulis notifikasi di dalam transaksi forward, assign, dan `resolved`. Commit: `feat(notification): create notifications on workflow events`
 - [x] **T68** Backend `GET /notifications` dan `PATCH /notifications/:id/read`. Commit: `feat(notification): add notification endpoints`
-- [ ] **T69** Flutter notifikasi: domain + data + bloc + halaman + badge di navigasi, polling 30-60 detik dan saat aplikasi dibuka kembali. Commit: `feat(notification): add notification feature with polling`
+- [x] **T69** Flutter notifikasi: domain + data + bloc + halaman + badge di navigasi, polling 30-60 detik dan saat aplikasi dibuka kembali. Commit: `feat(notification): add notification feature with polling`
 - [ ] **T70** Flutter: tampilkan `sla_status` dan sisa waktu di daftar dan detail tiket. Commit: `feat(sla): show sla status in ticket screens`
 
 ## Fase 8 - Dashboard (branch: `feature/dashboard`)
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-17 - T69 - Flutter notifikasi lengkap (domain AppNotification, repository, data source, NotificationBloc dengan optimistic markAsRead, NotificationPage, badge unread count di NavigationBar, dan timer polling 30 detik + lifecycle resume) selesai - flutter analyze (0 issue) dan test lolos - Task berikutnya: T70.
 
 - 2026-11-17 - T68 - Backend endpoint GET /notifications (daftar notifikasi terbaru & jumlah unread) dan PATCH /notifications/:id/read (tandai dibaca dicakup userId) selesai - Teruji 200 OK via script integrasi - Task berikutnya: T69.
 
