@@ -205,7 +205,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 
 ## Fase 7 - SLA dan notifikasi (branch: `feature/sla-notifications`)
 - [x] **T66** Backend: sertakan `sla_status` dan sisa waktu di respons daftar dan detail tiket. Commit: `feat(sla): include sla status in ticket responses`
-- [ ] **T67** Backend: tulis notifikasi di dalam transaksi forward, assign, dan `resolved`. Commit: `feat(notification): create notifications on workflow events`
+- [x] **T67** Backend: tulis notifikasi di dalam transaksi forward, assign, dan `resolved`. Commit: `feat(notification): create notifications on workflow events`
 - [ ] **T68** Backend `GET /notifications` dan `PATCH /notifications/:id/read`. Commit: `feat(notification): add notification endpoints`
 - [ ] **T69** Flutter notifikasi: domain + data + bloc + halaman + badge di navigasi, polling 30-60 detik dan saat aplikasi dibuka kembali. Commit: `feat(notification): add notification feature with polling`
 - [ ] **T70** Flutter: tampilkan `sla_status` dan sisa waktu di daftar dan detail tiket. Commit: `feat(sla): show sla status in ticket screens`
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-17 - T67 - Backend penulisan notifikasi atomik dalam transaksi DB untuk event workflow: forward (ke semua vendor_admin mitra), assign (ke teknisi yang ditugaskan), dan status resolved (ke semua tenant_admin pemilik tiket) selesai - Teruji query terintegrasi - Task berikutnya: T68.
 
 - 2026-11-17 - T66 - Backend perhitungan SLA dinamis (getSlaStatus: on_track, at_risk, overdue, met, breached) serta properti sla_status dan sla_remaining_seconds di seluruh respons daftar, detail, dan pembuatan tiket selesai - Teruji endpoint mengembalikan sla_status dan sla_remaining_seconds akurat - Task berikutnya: T67.
 
