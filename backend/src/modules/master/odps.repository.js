@@ -19,6 +19,17 @@ export class OdpRepository {
     const [rows] = await pool.query(query, params);
     return rows;
   }
+
+  async findByIdAndTenantId(id, tenantId) {
+    const query = `
+      SELECT id, tenant_id, area_id, code, latitude, longitude
+      FROM odps
+      WHERE id = ? AND tenant_id = ?
+      LIMIT 1
+    `;
+    const [rows] = await pool.query(query, [id, tenantId]);
+    return rows[0] || null;
+  }
 }
 
 export default new OdpRepository();

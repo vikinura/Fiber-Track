@@ -8,6 +8,11 @@ import {
   updateAreaSchema,
   deleteAreaSchema,
 } from './areas.schema.js';
+import {
+  createCustomerSchema,
+  updateCustomerSchema,
+  deleteCustomerSchema,
+} from './customers.schema.js';
 
 const router = Router();
 
@@ -24,6 +29,10 @@ router.get('/odps', masterController.getOdps);
 router.get('/issue-types', masterController.getIssueTypes);
 router.get('/priorities', masterController.getPriorities);
 router.get('/customers', masterController.getCustomers);
+router.post('/customers', validate(createCustomerSchema), masterController.createCustomer);
+router.put('/customers/:id', validate(updateCustomerSchema), masterController.updateCustomer);
+router.delete('/customers/:id', validate(deleteCustomerSchema), masterController.deleteCustomer);
+
 router.get('/vendors', masterController.getVendors);
 
 export default router;

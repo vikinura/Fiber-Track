@@ -89,6 +89,38 @@ export class MasterController {
     }
   }
 
+  async createCustomer(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const customer = await masterService.createCustomer(tenantId, req.body);
+      return sendSuccess(res, customer, 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateCustomer(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const id = req.params.id;
+      const customer = await masterService.updateCustomer(tenantId, id, req.body);
+      return sendSuccess(res, customer);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteCustomer(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const id = req.params.id;
+      await masterService.deleteCustomer(tenantId, id);
+      return sendSuccess(res, { message: 'Pelanggan berhasil dihapus' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getVendors(req, res, next) {
     try {
       const tenantId = req.auth.tenantId;

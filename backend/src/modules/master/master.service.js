@@ -53,6 +53,57 @@ export class MasterService {
     return customerRepository.findByTenantId(tenantId, { search, page, limit });
   }
 
+  async getCustomerById(tenantId, id) {
+    const customer = await customerRepository.findByIdAndTenantId(id, tenantId);
+    if (!customer) {
+      throw new NotFoundError('Pelanggan tidak ditemukan');
+    }
+    return customer;
+  }
+
+  async createCustomer(tenantId, data) {
+    // Validasi isolasi tenant untuk area_id & odp_id jika disediakan
+    if (data.area_id) {
+      await this.getAreaById(tenantId, data.area_id);
+    }
+    if (data.odp_id) {
+      const odp = await odpRepository.findByIdAndTenantId(data.odp_id, tenantId);
+      if (!odp) {
+        throw new NotFoundError('ODP tidak ditemukan');
+      }
+      if (data.area_id && odp.area_id !== data.area_id) {
+        throw new ConflictError('ODP tidak berada di dalam area yang dipilih');
+      }
+    }
+    return customerRepository.create(tenantId, data);
+  }
+
+  async updateCustomer(tenantId, id, data) {
+    await this.getCustomerById(tenantId, id);
+    if (data.area_id) {
+      await this.getAreaById(tenantId, data.area_id);
+    }
+    if (data.odp_id) {
+      const odp = await odpRepository.findByIdAndTenantId(data.odp_id, tenantId);
+      if (!odp) {
+        throw new NotFoundError('ODP tidak ditemukan');
+      }
+      if (data.area_id && odp.area_id !== data.area_id) {
+        throw new ConflictError('ODP tidak berada di dalam area yang dipilih');
+      }
+    }
+    return customerRepository.update(id, tenantId, data);
+  }
+
+  async deleteCustomer(tenantId, id) {
+    await this.getCustomerById(tenantId, id);
+    const isUsed = await customerRepository.isUsed(id, tenantId);
+    if (isUsed) {
+      throw new ConflictError('Pelanggan tidak dapat dihapus karena masih digunakan oleh data tiket gangguan');
+    }
+    return customerRepository.delete(id, tenantId);
+  }
+
   async getActiveVendors(tenantId) {
     return vendorRepository.findActiveByTenantId(tenantId);
   }
