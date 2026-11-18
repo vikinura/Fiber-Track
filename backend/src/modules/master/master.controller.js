@@ -12,6 +12,38 @@ export class MasterController {
     }
   }
 
+  async createArea(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const area = await masterService.createArea(tenantId, req.body);
+      return sendSuccess(res, area, 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateArea(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const id = req.params.id;
+      const area = await masterService.updateArea(tenantId, id, req.body);
+      return sendSuccess(res, area);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteArea(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const id = req.params.id;
+      await masterService.deleteArea(tenantId, id);
+      return sendSuccess(res, { message: 'Area berhasil dihapus' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getOdps(req, res, next) {
     try {
       const tenantId = req.auth.tenantId;
