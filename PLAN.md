@@ -218,7 +218,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T75** Postman dashboard + cocokkan angka dengan query SQL manual; catat hasil. Commit: `docs: add dashboard cases and manual verification`
 - [x] **T76** Flutter dashboard: domain + data. Commit: `feat(dashboard): add dashboard domain and data layers`
 - [x] **T77** Flutter dashboard: halaman dan kartu ringkasan. Commit: `feat(dashboard): add summary cards`
-- [ ] **T78** Flutter dashboard: grafik batang gangguan per area (`fl_chart`). Commit: `feat(dashboard): add area chart`
+- [x] **T78** Flutter dashboard: grafik batang gangguan per area (`fl_chart`). Commit: `feat(dashboard): add area chart`
 - [ ] **T79** Flutter dashboard: kinerja per vendor (daftar atau grafik). Commit: `feat(dashboard): add vendor performance section`
 
 ## Fase 9 - CRUD data master di aplikasi (prioritas rendah; potong dulu jika waktu mepet) (branch: `feature/master-crud`)
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-18 - T78 - Flutter Dashboard: grafik batang gangguan per area (AreaBarChartSection dengan fl_chart BarChart, visualisasi total tiket, selesai, dan tiket aktif per area jaringan, tooltip interaktif, legend, responsif tema) terintegrasi di DashboardPage selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Task berikutnya: T79.
 
 - 2026-11-18 - T77 - Flutter Dashboard: halaman DashboardPage, DashboardBloc, SummaryMetricCard, SummaryCardsSection (metrik total tiket, aktif, overdue, kepatuhan SLA, rata-rata durasi penyelesaian, rincian status tiket), rute /dashboard, tombol navigasi di RoleHomePage selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Task berikutnya: T78.
 

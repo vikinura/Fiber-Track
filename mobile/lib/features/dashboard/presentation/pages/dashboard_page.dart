@@ -9,6 +9,7 @@ import '../../../../core/widgets/loading_view.dart';
 import '../bloc/dashboard_bloc.dart';
 import '../bloc/dashboard_event.dart';
 import '../bloc/dashboard_state.dart';
+import '../widgets/area_bar_chart_section.dart';
 import '../widgets/summary_cards_section.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -73,6 +74,8 @@ class DashboardView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SummaryCardsSection(summary: state.summary),
+                    const SizedBox(height: AppSizes.p24),
+                    AreaBarChartSection(areas: state.areas),
                     const SizedBox(height: AppSizes.p24),
                   ],
                 ),
