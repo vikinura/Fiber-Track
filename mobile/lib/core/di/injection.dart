@@ -39,6 +39,11 @@ import '../../features/notification/domain/repositories/notification_repository.
 import '../../features/notification/domain/usecases/get_notifications.dart';
 import '../../features/notification/domain/usecases/mark_notification_as_read.dart';
 import '../../features/notification/presentation/bloc/notification_bloc.dart';
+import '../../features/dashboard/data/datasources/dashboard_remote_data_source.dart';
+import '../../features/dashboard/data/repositories/dashboard_repository_impl.dart';
+import '../../features/dashboard/domain/repositories/dashboard_repository.dart';
+import '../../features/dashboard/domain/usecases/dashboard_usecases.dart';
+import '../../features/dashboard/presentation/bloc/dashboard_bloc.dart';
 import '../network/dio_client.dart';
 import '../network/token_storage.dart';
 import '../theme/theme_cubit.dart';
@@ -207,6 +212,36 @@ Future<void> initDependencies() async {
     () => NotificationBloc(
       getNotifications: getIt<GetNotifications>(),
       markNotificationAsRead: getIt<MarkNotificationAsRead>(),
+    ),
+  );
+
+  // Dashboard Data Sources & Repository
+  getIt.registerLazySingleton<DashboardRemoteDataSource>(
+    () => DashboardRemoteDataSourceImpl(dioClient: getIt<DioClient>()),
+  );
+  getIt.registerLazySingleton<DashboardRepository>(
+    () => DashboardRepositoryImpl(
+      remoteDataSource: getIt<DashboardRemoteDataSource>(),
+    ),
+  );
+
+  // Dashboard Use Cases
+  getIt.registerLazySingleton<GetDashboardSummary>(
+    () => GetDashboardSummary(getIt<DashboardRepository>()),
+  );
+  getIt.registerLazySingleton<GetDashboardByArea>(
+    () => GetDashboardByArea(getIt<DashboardRepository>()),
+  );
+  getIt.registerLazySingleton<GetDashboardByVendor>(
+    () => GetDashboardByVendor(getIt<DashboardRepository>()),
+  );
+
+  // Dashboard Bloc
+  getIt.registerFactory<DashboardBloc>(
+    () => DashboardBloc(
+      getDashboardSummary: getIt<GetDashboardSummary>(),
+      getDashboardByArea: getIt<GetDashboardByArea>(),
+      getDashboardByVendor: getIt<GetDashboardByVendor>(),
     ),
   );
 }

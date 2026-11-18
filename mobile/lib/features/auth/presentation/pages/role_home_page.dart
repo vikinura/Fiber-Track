@@ -207,6 +207,17 @@ class RoleHomePage extends StatelessWidget {
                           label: const Text('Buat Tiket Baru'),
                         ),
                       ),
+                      const SizedBox(height: AppSizes.p12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.tonalIcon(
+                          onPressed: () {
+                            context.push('/dashboard');
+                          },
+                          icon: const Icon(Icons.dashboard_outlined),
+                          label: const Text('Buka Dashboard Rekap'),
+                        ),
+                      ),
                     ],
                   ],
                 ),
