@@ -215,7 +215,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T72** Backend `GET /dashboard/summary` (jumlah per status, overdue, rata-rata durasi, persentase SLA terpenuhi). Commit: `feat(dashboard): add summary endpoint`
 - [x] **T73** Backend `GET /dashboard/by-area`. Commit: `feat(dashboard): add by-area endpoint`
 - [x] **T74** Backend `GET /dashboard/by-vendor`. Commit: `feat(dashboard): add by-vendor endpoint`
-- [ ] **T75** Postman dashboard + cocokkan angka dengan query SQL manual; catat hasil. Commit: `docs: add dashboard cases and manual verification`
+- [x] **T75** Postman dashboard + cocokkan angka dengan query SQL manual; catat hasil. Commit: `docs: add dashboard cases and manual verification`
 - [ ] **T76** Flutter dashboard: domain + data. Commit: `feat(dashboard): add dashboard domain and data layers`
 - [ ] **T77** Flutter dashboard: halaman dan kartu ringkasan. Commit: `feat(dashboard): add summary cards`
 - [ ] **T78** Flutter dashboard: grafik batang gangguan per area (`fl_chart`). Commit: `feat(dashboard): add area chart`
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-18 - T75 - Koleksi Postman Dashboard (FiberTrack_Dashboard.postman_collection.json) dan pencocokan angka agregasi API vs query SQL manual selesai & dicatat di docs/pengujian.md - Seluruh 10 metrik cocok 100% dan role guard lolos - Task berikutnya: T76.
 
 - 2026-11-18 - T74 - Backend endpoint GET /dashboard/by-vendor (agregasi performa mitra vendor: total tiket ditangani, tiket diselesaikan, rata-rata durasi penyelesaian, dan persentase kepatuhan SLA per vendor) selesai - Teruji 200 OK via script dan route dashboard - Task berikutnya: T75.
 
