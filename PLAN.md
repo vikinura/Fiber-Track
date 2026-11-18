@@ -211,15 +211,15 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T70** Flutter: tampilkan `sla_status` dan sisa waktu di daftar dan detail tiket. Commit: `feat(sla): show sla status in ticket screens`
 
 ## Fase 8 - Dashboard (branch: `feature/dashboard`)
-- [ ] **T71** Seed 3: tiket contoh di berbagai status dan SLA (termasuk `at_risk`, `overdue`, `breached`). Commit: `feat(db): seed sample tickets`
-- [ ] **T72** Backend `GET /dashboard/summary` (jumlah per status, overdue, rata-rata durasi, persentase SLA terpenuhi). Commit: `feat(dashboard): add summary endpoint`
-- [ ] **T73** Backend `GET /dashboard/by-area`. Commit: `feat(dashboard): add by-area endpoint`
-- [ ] **T74** Backend `GET /dashboard/by-vendor`. Commit: `feat(dashboard): add by-vendor endpoint`
-- [ ] **T75** Postman dashboard + cocokkan angka dengan query SQL manual; catat hasil. Commit: `docs: add dashboard cases and manual verification`
-- [ ] **T76** Flutter dashboard: domain + data. Commit: `feat(dashboard): add dashboard domain and data layers`
-- [ ] **T77** Flutter dashboard: halaman dan kartu ringkasan. Commit: `feat(dashboard): add summary cards`
-- [ ] **T78** Flutter dashboard: grafik batang gangguan per area (`fl_chart`). Commit: `feat(dashboard): add area chart`
-- [ ] **T79** Flutter dashboard: kinerja per vendor (daftar atau grafik). Commit: `feat(dashboard): add vendor performance section`
+- [x] **T71** Seed 3: tiket contoh di berbagai status dan SLA (termasuk `at_risk`, `overdue`, `breached`). Commit: `feat(db): seed sample tickets`
+- [x] **T72** Backend `GET /dashboard/summary` (jumlah per status, overdue, rata-rata durasi, persentase SLA terpenuhi). Commit: `feat(dashboard): add summary endpoint`
+- [x] **T73** Backend `GET /dashboard/by-area`. Commit: `feat(dashboard): add by-area endpoint`
+- [x] **T74** Backend `GET /dashboard/by-vendor`. Commit: `feat(dashboard): add by-vendor endpoint`
+- [x] **T75** Postman dashboard + cocokkan angka dengan query SQL manual; catat hasil. Commit: `docs: add dashboard cases and manual verification`
+- [x] **T76** Flutter dashboard: domain + data. Commit: `feat(dashboard): add dashboard domain and data layers`
+- [x] **T77** Flutter dashboard: halaman dan kartu ringkasan. Commit: `feat(dashboard): add summary cards`
+- [x] **T78** Flutter dashboard: grafik batang gangguan per area (`fl_chart`). Commit: `feat(dashboard): add area chart`
+- [x] **T79** Flutter dashboard: kinerja per vendor (daftar atau grafik). Commit: `feat(dashboard): add vendor performance section`
 
 ## Fase 9 - CRUD data master di aplikasi (prioritas rendah; potong dulu jika waktu mepet) (branch: `feature/master-crud`)
 - [ ] **T80** Backend area: `POST`, `PUT`, `DELETE` (hapus ditolak 409 jika dipakai). Commit: `feat(master): add area write endpoints`
@@ -251,6 +251,24 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-18 - T79 - Flutter Dashboard: komponen kinerja vendor (VendorPerformanceSection dengan metrik total ditangani, diselesaikan, tiket aktif, durasi rata-rata pengerjaan, persentase kepatuhan SLA dengan indikator warna, status kosong) terintegrasi di DashboardPage selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Seluruh rangkaian Fase 8 (T71-T79) selesai.
+
+- 2026-11-18 - T78 - Flutter Dashboard: grafik batang gangguan per area (AreaBarChartSection dengan fl_chart BarChart, visualisasi total tiket, selesai, dan tiket aktif per area jaringan, tooltip interaktif, legend, responsif tema) terintegrasi di DashboardPage selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Task berikutnya: T79.
+
+- 2026-11-18 - T77 - Flutter Dashboard: halaman DashboardPage, DashboardBloc, SummaryMetricCard, SummaryCardsSection (metrik total tiket, aktif, overdue, kepatuhan SLA, rata-rata durasi penyelesaian, rincian status tiket), rute /dashboard, tombol navigasi di RoleHomePage selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Task berikutnya: T78.
+
+- 2026-11-18 - T76 - Flutter domain & data layer dashboard (entities DashboardSummary, DashboardArea, DashboardVendor, repository interface, models, remote data source, repository implementation, use cases, registrasi DI di injection.dart) selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Task berikutnya: T77.
+
+- 2026-11-18 - T75 - Koleksi Postman Dashboard (FiberTrack_Dashboard.postman_collection.json) dan pencocokan angka agregasi API vs query SQL manual selesai & dicatat di docs/pengujian.md - Seluruh 10 metrik cocok 100% dan role guard lolos - Task berikutnya: T76.
+
+- 2026-11-18 - T74 - Backend endpoint GET /dashboard/by-vendor (agregasi performa mitra vendor: total tiket ditangani, tiket diselesaikan, rata-rata durasi penyelesaian, dan persentase kepatuhan SLA per vendor) selesai - Teruji 200 OK via script dan route dashboard - Task berikutnya: T75.
+
+- 2026-11-18 - T73 - Backend endpoint GET /dashboard/by-area (agregasi sebaran total tiket, tiket aktif, dan tiket resolved per area jaringan tenant) selesai - Teruji 200 OK via script dan route dashboard - Task berikutnya: T74.
+
+- 2026-11-18 - T72 - Backend endpoint GET /dashboard/summary (agregasi jumlah tiket per status, tiket overdue, rata-rata durasi penyelesaian dalam jam, persentase kepatuhan SLA) selesai - Teruji 200 OK via script pengujian - Task berikutnya: T73.
+
+- 2026-11-18 - T71 - Seed 3 (003_sample_tickets_seed.js) memuat tiket contoh berbagai status (new, forwarded, assigned, in_progress, resolved) dan SLA (on_track, at_risk, overdue, met, breached) serta riwayatnya selesai - Teruji npm run seed berjalan lancar dan idempotent - Task berikutnya: T72.
 
 - 2026-11-17 - T70 - Flutter penyajian visual status SLA dan sisa waktu pengerjaan di layar daftar tiket (_TicketCard) dan detail tiket (TicketDetailPage) dengan indikator SlaBadge (aman/mendekati batas/telat/terpenuhi/melebihi batas) selesai - flutter analyze (0 issue) dan test lolos - Task berikutnya: T71 (Fase 8: Dashboard).
 

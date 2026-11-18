@@ -1,0 +1,82 @@
+{
+  "info": {
+    "name": "Fiber Track - Dashboard API",
+    "_postman_id": "fibertrack-dashboard-collection",
+    "description": "Koleksi Postman untuk pengujian endpoint Dashboard (Summary, By Area, By Vendor) dengan verifikasi role guard.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. GET Dashboard Summary - Tenant Admin (200 OK)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tenant_admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/dashboard/summary",
+          "host": ["{{base_url}}"],
+          "path": ["dashboard", "summary"]
+        }
+      }
+    },
+    {
+      "name": "2. GET Dashboard By Area - Tenant Admin (200 OK)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tenant_admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/dashboard/by-area",
+          "host": ["{{base_url}}"],
+          "path": ["dashboard", "by-area"]
+        }
+      }
+    },
+    {
+      "name": "3. GET Dashboard By Vendor - Tenant Admin (200 OK)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tenant_admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/dashboard/by-vendor",
+          "host": ["{{base_url}}"],
+          "path": ["dashboard", "by-vendor"]
+        }
+      }
+    },
+    {
+      "name": "4. GET Dashboard Summary - Role Guard Non-Tenant Admin (403 Forbidden)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{vendor_admin_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/dashboard/summary",
+          "host": ["{{base_url}}"],
+          "path": ["dashboard", "summary"]
+        }
+      }
+    }
+  ]
+}
