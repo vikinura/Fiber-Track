@@ -22,6 +22,7 @@ import '../../features/master/domain/usecases/get_priorities.dart';
 import '../../features/master/domain/usecases/get_technicians.dart';
 import '../../features/master/domain/usecases/get_vendors.dart';
 import '../../features/master/presentation/bloc/area_bloc.dart';
+import '../../features/master/presentation/bloc/customer_bloc.dart';
 import '../../features/ticket/data/datasources/ticket_remote_data_source.dart';
 import '../../features/ticket/data/repositories/ticket_repository_impl.dart';
 import '../../features/ticket/domain/repositories/ticket_repository.dart';
@@ -157,6 +158,14 @@ Future<void> initDependencies() async {
       createArea: getIt<CreateArea>(),
       updateArea: getIt<UpdateArea>(),
       deleteArea: getIt<DeleteArea>(),
+    ),
+  );
+  getIt.registerFactory<CustomerBloc>(
+    () => CustomerBloc(
+      getCustomers: getIt<GetCustomers>(),
+      createCustomer: getIt<CreateCustomer>(),
+      updateCustomer: getIt<UpdateCustomer>(),
+      deleteCustomer: getIt<DeleteCustomer>(),
     ),
   );
 

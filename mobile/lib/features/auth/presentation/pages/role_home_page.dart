@@ -229,6 +229,17 @@ class RoleHomePage extends StatelessWidget {
                           label: const Text('Kelola Area Jaringan'),
                         ),
                       ),
+                      const SizedBox(height: AppSizes.p12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            context.push('/master/customers');
+                          },
+                          icon: const Icon(Icons.people_outline_rounded),
+                          label: const Text('Kelola Data Pelanggan'),
+                        ),
+                      ),
                     ],
                   ],
                 ),
