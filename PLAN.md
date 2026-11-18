@@ -212,7 +212,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 
 ## Fase 8 - Dashboard (branch: `feature/dashboard`)
 - [x] **T71** Seed 3: tiket contoh di berbagai status dan SLA (termasuk `at_risk`, `overdue`, `breached`). Commit: `feat(db): seed sample tickets`
-- [ ] **T72** Backend `GET /dashboard/summary` (jumlah per status, overdue, rata-rata durasi, persentase SLA terpenuhi). Commit: `feat(dashboard): add summary endpoint`
+- [x] **T72** Backend `GET /dashboard/summary` (jumlah per status, overdue, rata-rata durasi, persentase SLA terpenuhi). Commit: `feat(dashboard): add summary endpoint`
 - [ ] **T73** Backend `GET /dashboard/by-area`. Commit: `feat(dashboard): add by-area endpoint`
 - [ ] **T74** Backend `GET /dashboard/by-vendor`. Commit: `feat(dashboard): add by-vendor endpoint`
 - [ ] **T75** Postman dashboard + cocokkan angka dengan query SQL manual; catat hasil. Commit: `docs: add dashboard cases and manual verification`
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-18 - T72 - Backend endpoint GET /dashboard/summary (agregasi jumlah tiket per status, tiket overdue, rata-rata durasi penyelesaian dalam jam, persentase kepatuhan SLA) selesai - Teruji 200 OK via script pengujian - Task berikutnya: T73.
 
 - 2026-11-18 - T71 - Seed 3 (003_sample_tickets_seed.js) memuat tiket contoh berbagai status (new, forwarded, assigned, in_progress, resolved) dan SLA (on_track, at_risk, overdue, met, breached) serta riwayatnya selesai - Teruji npm run seed berjalan lancar dan idempotent - Task berikutnya: T72.
 
