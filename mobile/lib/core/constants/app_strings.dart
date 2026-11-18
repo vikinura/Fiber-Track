@@ -58,4 +58,17 @@ class AppStrings {
   static const String tenantHomeTitle = 'Beranda Admin Tenant';
   static const String vendorHomeTitle = 'Beranda Admin Vendor';
   static const String technicianHomeTitle = 'Beranda Teknisi';
+
+  // Dashboard
+  static const String dashboard = 'Dashboard';
+  static const String dashboardTitle = 'Dashboard Pemantauan';
+  static const String totalTickets = 'Total Tiket';
+  static const String activeTickets = 'Tiket Aktif';
+  static const String overdueTickets = 'Tiket Overdue';
+  static const String slaCompliance = 'Kepatuhan SLA';
+  static const String avgResolutionTime = 'Rata-rata Selesai';
+  static const String ticketDistributionByArea = 'Distribusi Tiket per Area';
+  static const String vendorPerformance = 'Performa Mitra Vendor';
+  static const String statusBreakdown = 'Rincian Status Tiket';
+  static const String resolvedTickets = 'Tiket Selesai';
 }
