@@ -308,6 +308,35 @@ export class TicketRepository {
         note || (isResolved ? 'Tiket diselesaikan oleh teknisi' : 'Tiket mulai dikerjakan'),
       ]);
 
+      // Jika resolved -> buat notifikasi untuk semua tenant_admin dari tenant pemilik tiket
+      if (isResolved) {
+        const [ticketRow] = await connection.query(
+          'SELECT tenant_id, ticket_no FROM tickets WHERE id = ?',
+          [ticketId]
+        );
+        if (ticketRow && ticketRow.length > 0) {
+          const tenantId = ticketRow[0].tenant_id;
+          const ticketNo = ticketRow[0].ticket_no;
+
+          const [taRows] = await connection.query(
+            `SELECT id FROM users WHERE tenant_id = ? AND role = 'tenant_admin' AND is_active = 1`,
+            [tenantId]
+          );
+
+          if (taRows && taRows.length > 0) {
+            const notifValues = taRows.map(ta => [
+              ta.id,
+              ticketId,
+              `Tiket ${ticketNo} telah selesai dikerjakan (resolved)`,
+            ]);
+            await connection.query(
+              `INSERT INTO notifications (user_id, ticket_id, message, created_at) VALUES ?`,
+              [notifValues.map(v => [...v, new Date()])]
+            );
+          }
+        }
+      }
+
       await connection.commit();
       return true;
     } catch (error) {
@@ -364,6 +393,18 @@ export class TicketRepository {
         `Tiket ditugaskan ke ${techName}`,
       ]);
 
+      // 4. Buat notifikasi untuk teknisi yang ditugaskan
+      const [ticketRow] = await connection.query(
+        'SELECT ticket_no FROM tickets WHERE id = ?',
+        [ticketId]
+      );
+      const ticketNo = ticketRow?.[0]?.ticket_no ?? `#${ticketId}`;
+      await connection.query(
+        `INSERT INTO notifications (user_id, ticket_id, message, created_at)
+         VALUES (?, ?, ?, NOW())`,
+        [technicianId, ticketId, `Anda ditugaskan untuk mengerjakan tiket ${ticketNo}`]
+      );
+
       await connection.commit();
       return true;
     } catch (error) {
@@ -419,6 +460,28 @@ export class TicketRepository {
         userId,
         `Tiket diteruskan ke ${vendorName}`,
       ]);
+
+      // 4. Buat notifikasi untuk semua vendor_admin dari vendor tujuan
+      const [vaRows] = await connection.query(
+        `SELECT id FROM users WHERE vendor_id = ? AND role = 'vendor_admin' AND is_active = 1`,
+        [vendorId]
+      );
+      if (vaRows && vaRows.length > 0) {
+        const [ticketRow] = await connection.query(
+          'SELECT ticket_no FROM tickets WHERE id = ?',
+          [ticketId]
+        );
+        const ticketNo = ticketRow?.[0]?.ticket_no ?? `#${ticketId}`;
+        const notifValues = vaRows.map(va => [
+          va.id,
+          ticketId,
+          `Tiket baru ${ticketNo} telah diteruskan ke vendor Anda`,
+        ]);
+        await connection.query(
+          `INSERT INTO notifications (user_id, ticket_id, message, created_at) VALUES ?`,
+          [notifValues.map(v => [...v, new Date()])]
+        );
+      }
 
       await connection.commit();
       return true;
