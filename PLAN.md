@@ -225,7 +225,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T80** Backend area: `POST`, `PUT`, `DELETE` (hapus ditolak 409 jika dipakai). Commit: `feat(master): add area write endpoints`
 - [x] **T81** Backend pelanggan: `POST`, `PUT`, `DELETE`. Commit: `feat(master): add customer write endpoints`
 - [x] **T82** Backend ODP, jenis gangguan, prioritas: `POST`, `PUT`, `DELETE`. Commit: `feat(master): add odp, issue type and priority write endpoints`
-- [ ] **T83** Flutter: kelola area (daftar + form + hapus). Commit: `feat(master): add area management screens`
+- [x] **T83** Flutter: kelola area (daftar + form + hapus). Commit: `feat(master): add area management screens`
 - [ ] **T84** Flutter: kelola pelanggan (daftar + form + hapus). Commit: `feat(master): add customer management screens`
 
 ## Fase 10 - Penyelesaian (branch: `feature/finishing`)
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-18 - T83 - Flutter kelola area jaringan (use cases CreateArea/UpdateArea/DeleteArea, remote data source CRUD, repository impl, AreaBloc, AreaListPage, dialog AreaFormDialog, konfirmasi hapus, rute /master/areas, integrasi di RoleHomePage) selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Task berikutnya: T84.
 
 - 2026-11-18 - T82 - Backend endpoint write ODP (POST, PUT, DELETE /odps), Jenis Gangguan (POST, PUT, DELETE /issue-types), dan Prioritas (POST, PUT, DELETE /priorities) dengan skema validasi Zod, proteksi 409 Conflict jika entitas digunakan di tiket/pelanggan, dan isolasi tenantId selesai - Seluruh pengujian create, update, 409 conflict, delete berhasil lolos - Task berikutnya: T83.
 

@@ -22,4 +22,34 @@ abstract class MasterLookupRepository {
     int page = 1,
     int limit = 10,
   });
+
+  // Write operations for Area
+  Future<Either<Failure, Area>> createArea({
+    required String name,
+    String? description,
+  });
+  Future<Either<Failure, Area>> updateArea({
+    required int id,
+    required String name,
+    String? description,
+  });
+  Future<Either<Failure, void>> deleteArea(int id);
+
+  // Write operations for Customer
+  Future<Either<Failure, Customer>> createCustomer({
+    required String name,
+    String? phone,
+    String? address,
+    int? areaId,
+    int? odpId,
+  });
+  Future<Either<Failure, Customer>> updateCustomer({
+    required int id,
+    required String name,
+    String? phone,
+    String? address,
+    int? areaId,
+    int? odpId,
+  });
+  Future<Either<Failure, void>> deleteCustomer(int id);
 }

@@ -6,6 +6,7 @@ import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/main_navigation_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../../features/master/presentation/pages/area_list_page.dart';
 import '../../features/notification/presentation/pages/notification_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/ticket/domain/entities/ticket.dart';
@@ -57,6 +58,10 @@ GoRouter createRouter(AuthBloc authBloc) {
       GoRoute(
         path: '/dashboard',
         builder: (context, state) => const DashboardPage(),
+      ),
+      GoRoute(
+        path: '/master/areas',
+        builder: (context, state) => const AreaListPage(),
       ),
       GoRoute(
         path: '/tickets',

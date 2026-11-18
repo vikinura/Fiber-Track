@@ -102,4 +102,104 @@ class MasterLookupRepositoryImpl implements MasterLookupRepository {
       return Left(mapExceptionToFailure(e));
     }
   }
+
+  @override
+  Future<Either<Failure, Area>> createArea({
+    required String name,
+    String? description,
+  }) async {
+    try {
+      final model = await remoteDataSource.createArea(
+        name: name,
+        description: description,
+      );
+      return Right(model.toEntity());
+    } on Exception catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Area>> updateArea({
+    required int id,
+    required String name,
+    String? description,
+  }) async {
+    try {
+      final model = await remoteDataSource.updateArea(
+        id: id,
+        name: name,
+        description: description,
+      );
+      return Right(model.toEntity());
+    } on Exception catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteArea(int id) async {
+    try {
+      await remoteDataSource.deleteArea(id);
+      return const Right(null);
+    } on Exception catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Customer>> createCustomer({
+    required String name,
+    String? phone,
+    String? address,
+    int? areaId,
+    int? odpId,
+  }) async {
+    try {
+      final model = await remoteDataSource.createCustomer(
+        name: name,
+        phone: phone,
+        address: address,
+        areaId: areaId,
+        odpId: odpId,
+      );
+      return Right(model.toEntity());
+    } on Exception catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Customer>> updateCustomer({
+    required int id,
+    required String name,
+    String? phone,
+    String? address,
+    int? areaId,
+    int? odpId,
+  }) async {
+    try {
+      final model = await remoteDataSource.updateCustomer(
+        id: id,
+        name: name,
+        phone: phone,
+        address: address,
+        areaId: areaId,
+        odpId: odpId,
+      );
+      return Right(model.toEntity());
+    } on Exception catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteCustomer(int id) async {
+    try {
+      await remoteDataSource.deleteCustomer(id);
+      return const Right(null);
+    } on Exception catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
 }

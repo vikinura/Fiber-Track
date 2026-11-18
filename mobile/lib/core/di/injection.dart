@@ -12,6 +12,8 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/master/data/datasources/master_remote_data_source.dart';
 import '../../features/master/data/repositories/master_lookup_repository_impl.dart';
 import '../../features/master/domain/repositories/master_lookup_repository.dart';
+import '../../features/master/domain/usecases/area_crud_usecases.dart';
+import '../../features/master/domain/usecases/customer_crud_usecases.dart';
 import '../../features/master/domain/usecases/get_areas.dart';
 import '../../features/master/domain/usecases/get_customers.dart';
 import '../../features/master/domain/usecases/get_issue_types.dart';
@@ -19,6 +21,7 @@ import '../../features/master/domain/usecases/get_odps.dart';
 import '../../features/master/domain/usecases/get_priorities.dart';
 import '../../features/master/domain/usecases/get_technicians.dart';
 import '../../features/master/domain/usecases/get_vendors.dart';
+import '../../features/master/presentation/bloc/area_bloc.dart';
 import '../../features/ticket/data/datasources/ticket_remote_data_source.dart';
 import '../../features/ticket/data/repositories/ticket_repository_impl.dart';
 import '../../features/ticket/domain/repositories/ticket_repository.dart';
@@ -127,6 +130,34 @@ Future<void> initDependencies() async {
   );
   getIt.registerLazySingleton<GetTechnicians>(
     () => GetTechnicians(getIt<MasterLookupRepository>()),
+  );
+  getIt.registerLazySingleton<CreateArea>(
+    () => CreateArea(getIt<MasterLookupRepository>()),
+  );
+  getIt.registerLazySingleton<UpdateArea>(
+    () => UpdateArea(getIt<MasterLookupRepository>()),
+  );
+  getIt.registerLazySingleton<DeleteArea>(
+    () => DeleteArea(getIt<MasterLookupRepository>()),
+  );
+  getIt.registerLazySingleton<CreateCustomer>(
+    () => CreateCustomer(getIt<MasterLookupRepository>()),
+  );
+  getIt.registerLazySingleton<UpdateCustomer>(
+    () => UpdateCustomer(getIt<MasterLookupRepository>()),
+  );
+  getIt.registerLazySingleton<DeleteCustomer>(
+    () => DeleteCustomer(getIt<MasterLookupRepository>()),
+  );
+
+  // Master Blocs
+  getIt.registerFactory<AreaBloc>(
+    () => AreaBloc(
+      getAreas: getIt<GetAreas>(),
+      createArea: getIt<CreateArea>(),
+      updateArea: getIt<UpdateArea>(),
+      deleteArea: getIt<DeleteArea>(),
+    ),
   );
 
   // Ticket Data Sources & Repository

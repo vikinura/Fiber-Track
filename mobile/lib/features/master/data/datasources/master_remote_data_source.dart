@@ -24,6 +24,33 @@ abstract class MasterRemoteDataSource {
     int page = 1,
     int limit = 10,
   });
+
+  // Area write operations
+  Future<AreaModel> createArea({required String name, String? description});
+  Future<AreaModel> updateArea({
+    required int id,
+    required String name,
+    String? description,
+  });
+  Future<void> deleteArea(int id);
+
+  // Customer write operations
+  Future<CustomerModel> createCustomer({
+    required String name,
+    String? phone,
+    String? address,
+    int? areaId,
+    int? odpId,
+  });
+  Future<CustomerModel> updateCustomer({
+    required int id,
+    required String name,
+    String? phone,
+    String? address,
+    int? areaId,
+    int? odpId,
+  });
+  Future<void> deleteCustomer(int id);
 }
 
 class MasterRemoteDataSourceImpl implements MasterRemoteDataSource {
@@ -247,6 +274,142 @@ class MasterRemoteDataSourceImpl implements MasterRemoteDataSource {
         rethrow;
       }
       throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<AreaModel> createArea({
+    required String name,
+    String? description,
+  }) async {
+    try {
+      final response = await dioClient.dio.post(
+        '/areas',
+        data: {
+          'name': name,
+          ...?description != null ? {'description': description} : null,
+        },
+      );
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is Map<String, dynamic>) {
+        return AreaModel.fromJson(responseData['data'] as Map<String, dynamic>);
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    }
+  }
+
+  @override
+  Future<AreaModel> updateArea({
+    required int id,
+    required String name,
+    String? description,
+  }) async {
+    try {
+      final response = await dioClient.dio.put(
+        '/areas/$id',
+        data: {
+          'name': name,
+          ...?description != null ? {'description': description} : null,
+        },
+      );
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is Map<String, dynamic>) {
+        return AreaModel.fromJson(responseData['data'] as Map<String, dynamic>);
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    }
+  }
+
+  @override
+  Future<void> deleteArea(int id) async {
+    try {
+      await dioClient.dio.delete('/areas/$id');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    }
+  }
+
+  @override
+  Future<CustomerModel> createCustomer({
+    required String name,
+    String? phone,
+    String? address,
+    int? areaId,
+    int? odpId,
+  }) async {
+    try {
+      final response = await dioClient.dio.post(
+        '/customers',
+        data: {
+          'name': name,
+          ...?phone != null ? {'phone': phone} : null,
+          ...?address != null ? {'address': address} : null,
+          ...?areaId != null ? {'area_id': areaId} : null,
+          ...?odpId != null ? {'odp_id': odpId} : null,
+        },
+      );
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is Map<String, dynamic>) {
+        return CustomerModel.fromJson(
+          responseData['data'] as Map<String, dynamic>,
+        );
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    }
+  }
+
+  @override
+  Future<CustomerModel> updateCustomer({
+    required int id,
+    required String name,
+    String? phone,
+    String? address,
+    int? areaId,
+    int? odpId,
+  }) async {
+    try {
+      final response = await dioClient.dio.put(
+        '/customers/$id',
+        data: {
+          'name': name,
+          ...?phone != null ? {'phone': phone} : null,
+          ...?address != null ? {'address': address} : null,
+          ...?areaId != null ? {'area_id': areaId} : null,
+          ...?odpId != null ? {'odp_id': odpId} : null,
+        },
+      );
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> &&
+          responseData['success'] == true &&
+          responseData['data'] is Map<String, dynamic>) {
+        return CustomerModel.fromJson(
+          responseData['data'] as Map<String, dynamic>,
+        );
+      }
+      throw const ServerException(message: 'Format respons tidak valid');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
+    }
+  }
+
+  @override
+  Future<void> deleteCustomer(int id) async {
+    try {
+      await dioClient.dio.delete('/customers/$id');
+    } on DioException catch (e) {
+      throw mapDioErrorToException(e);
     }
   }
 }
