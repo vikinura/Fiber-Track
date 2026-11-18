@@ -41,12 +41,100 @@ export class MasterService {
     return odpRepository.findByTenantId(tenantId, areaId);
   }
 
+  async getOdpById(tenantId, id) {
+    const odp = await odpRepository.findByIdAndTenantId(id, tenantId);
+    if (!odp) {
+      throw new NotFoundError('ODP tidak ditemukan');
+    }
+    return odp;
+  }
+
+  async createOdp(tenantId, data) {
+    await this.getAreaById(tenantId, data.area_id);
+    const existing = await odpRepository.findByCodeAndTenantId(data.code, tenantId);
+    if (existing) {
+      throw new ConflictError(`ODP dengan kode ${data.code} sudah terdaftar`);
+    }
+    return odpRepository.create(tenantId, data);
+  }
+
+  async updateOdp(tenantId, id, data) {
+    await this.getOdpById(tenantId, id);
+    await this.getAreaById(tenantId, data.area_id);
+    const existing = await odpRepository.findByCodeAndTenantId(data.code, tenantId);
+    if (existing && existing.id !== Number(id)) {
+      throw new ConflictError(`ODP dengan kode ${data.code} sudah digunakan`);
+    }
+    return odpRepository.update(id, tenantId, data);
+  }
+
+  async deleteOdp(tenantId, id) {
+    await this.getOdpById(tenantId, id);
+    const isUsed = await odpRepository.isUsed(id, tenantId);
+    if (isUsed) {
+      throw new ConflictError('ODP tidak dapat dihapus karena masih digunakan oleh data tiket atau pelanggan');
+    }
+    return odpRepository.delete(id, tenantId);
+  }
+
   async getIssueTypes(tenantId) {
     return issueTypeRepository.findByTenantId(tenantId);
   }
 
+  async getIssueTypeById(tenantId, id) {
+    const issueType = await issueTypeRepository.findByIdAndTenantId(id, tenantId);
+    if (!issueType) {
+      throw new NotFoundError('Jenis gangguan tidak ditemukan');
+    }
+    return issueType;
+  }
+
+  async createIssueType(tenantId, data) {
+    return issueTypeRepository.create(tenantId, data);
+  }
+
+  async updateIssueType(tenantId, id, data) {
+    await this.getIssueTypeById(tenantId, id);
+    return issueTypeRepository.update(id, tenantId, data);
+  }
+
+  async deleteIssueType(tenantId, id) {
+    await this.getIssueTypeById(tenantId, id);
+    const isUsed = await issueTypeRepository.isUsed(id, tenantId);
+    if (isUsed) {
+      throw new ConflictError('Jenis gangguan tidak dapat dihapus karena masih digunakan oleh data tiket');
+    }
+    return issueTypeRepository.delete(id, tenantId);
+  }
+
   async getPriorities(tenantId) {
     return priorityRepository.findByTenantId(tenantId);
+  }
+
+  async getPriorityById(tenantId, id) {
+    const priority = await priorityRepository.findByIdAndTenantId(id, tenantId);
+    if (!priority) {
+      throw new NotFoundError('Prioritas tidak ditemukan');
+    }
+    return priority;
+  }
+
+  async createPriority(tenantId, data) {
+    return priorityRepository.create(tenantId, data);
+  }
+
+  async updatePriority(tenantId, id, data) {
+    await this.getPriorityById(tenantId, id);
+    return priorityRepository.update(id, tenantId, data);
+  }
+
+  async deletePriority(tenantId, id) {
+    await this.getPriorityById(tenantId, id);
+    const isUsed = await priorityRepository.isUsed(id, tenantId);
+    if (isUsed) {
+      throw new ConflictError('Prioritas tidak dapat dihapus karena masih digunakan oleh data tiket');
+    }
+    return priorityRepository.delete(id, tenantId);
   }
 
   async getCustomers(tenantId, { search, page, limit }) {

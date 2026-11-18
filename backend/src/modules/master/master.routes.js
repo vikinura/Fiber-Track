@@ -13,6 +13,17 @@ import {
   updateCustomerSchema,
   deleteCustomerSchema,
 } from './customers.schema.js';
+import {
+  createOdpSchema,
+  updateOdpSchema,
+  deleteOdpSchema,
+  createIssueTypeSchema,
+  updateIssueTypeSchema,
+  deleteIssueTypeSchema,
+  createPrioritySchema,
+  updatePrioritySchema,
+  deletePrioritySchema,
+} from './master_extra.schema.js';
 
 const router = Router();
 
@@ -26,8 +37,19 @@ router.put('/areas/:id', validate(updateAreaSchema), masterController.updateArea
 router.delete('/areas/:id', validate(deleteAreaSchema), masterController.deleteArea);
 
 router.get('/odps', masterController.getOdps);
+router.post('/odps', validate(createOdpSchema), masterController.createOdp);
+router.put('/odps/:id', validate(updateOdpSchema), masterController.updateOdp);
+router.delete('/odps/:id', validate(deleteOdpSchema), masterController.deleteOdp);
+
 router.get('/issue-types', masterController.getIssueTypes);
+router.post('/issue-types', validate(createIssueTypeSchema), masterController.createIssueType);
+router.put('/issue-types/:id', validate(updateIssueTypeSchema), masterController.updateIssueType);
+router.delete('/issue-types/:id', validate(deleteIssueTypeSchema), masterController.deleteIssueType);
+
 router.get('/priorities', masterController.getPriorities);
+router.post('/priorities', validate(createPrioritySchema), masterController.createPriority);
+router.put('/priorities/:id', validate(updatePrioritySchema), masterController.updatePriority);
+router.delete('/priorities/:id', validate(deletePrioritySchema), masterController.deletePriority);
 router.get('/customers', masterController.getCustomers);
 router.post('/customers', validate(createCustomerSchema), masterController.createCustomer);
 router.put('/customers/:id', validate(updateCustomerSchema), masterController.updateCustomer);

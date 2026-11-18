@@ -55,6 +55,38 @@ export class MasterController {
     }
   }
 
+  async createOdp(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const odp = await masterService.createOdp(tenantId, req.body);
+      return sendSuccess(res, odp, 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateOdp(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const id = req.params.id;
+      const odp = await masterService.updateOdp(tenantId, id, req.body);
+      return sendSuccess(res, odp);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteOdp(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const id = req.params.id;
+      await masterService.deleteOdp(tenantId, id);
+      return sendSuccess(res, { message: 'ODP berhasil dihapus' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getIssueTypes(req, res, next) {
     try {
       const tenantId = req.auth.tenantId;
@@ -65,11 +97,75 @@ export class MasterController {
     }
   }
 
+  async createIssueType(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const issueType = await masterService.createIssueType(tenantId, req.body);
+      return sendSuccess(res, issueType, 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateIssueType(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const id = req.params.id;
+      const issueType = await masterService.updateIssueType(tenantId, id, req.body);
+      return sendSuccess(res, issueType);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteIssueType(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const id = req.params.id;
+      await masterService.deleteIssueType(tenantId, id);
+      return sendSuccess(res, { message: 'Jenis gangguan berhasil dihapus' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getPriorities(req, res, next) {
     try {
       const tenantId = req.auth.tenantId;
       const priorities = await masterService.getPriorities(tenantId);
       return sendSuccess(res, priorities);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async createPriority(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const priority = await masterService.createPriority(tenantId, req.body);
+      return sendSuccess(res, priority, 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updatePriority(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const id = req.params.id;
+      const priority = await masterService.updatePriority(tenantId, id, req.body);
+      return sendSuccess(res, priority);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deletePriority(req, res, next) {
+    try {
+      const tenantId = req.auth.tenantId;
+      const id = req.params.id;
+      await masterService.deletePriority(tenantId, id);
+      return sendSuccess(res, { message: 'Prioritas berhasil dihapus' });
     } catch (error) {
       next(error);
     }

@@ -224,7 +224,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 ## Fase 9 - CRUD data master di aplikasi (prioritas rendah; potong dulu jika waktu mepet) (branch: `feature/master-crud`)
 - [x] **T80** Backend area: `POST`, `PUT`, `DELETE` (hapus ditolak 409 jika dipakai). Commit: `feat(master): add area write endpoints`
 - [x] **T81** Backend pelanggan: `POST`, `PUT`, `DELETE`. Commit: `feat(master): add customer write endpoints`
-- [ ] **T82** Backend ODP, jenis gangguan, prioritas: `POST`, `PUT`, `DELETE`. Commit: `feat(master): add odp, issue type and priority write endpoints`
+- [x] **T82** Backend ODP, jenis gangguan, prioritas: `POST`, `PUT`, `DELETE`. Commit: `feat(master): add odp, issue type and priority write endpoints`
 - [ ] **T83** Flutter: kelola area (daftar + form + hapus). Commit: `feat(master): add area management screens`
 - [ ] **T84** Flutter: kelola pelanggan (daftar + form + hapus). Commit: `feat(master): add customer management screens`
 
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-18 - T82 - Backend endpoint write ODP (POST, PUT, DELETE /odps), Jenis Gangguan (POST, PUT, DELETE /issue-types), dan Prioritas (POST, PUT, DELETE /priorities) dengan skema validasi Zod, proteksi 409 Conflict jika entitas digunakan di tiket/pelanggan, dan isolasi tenantId selesai - Seluruh pengujian create, update, 409 conflict, delete berhasil lolos - Task berikutnya: T83.
 
 - 2026-11-18 - T81 - Backend endpoint write pelanggan (POST /customers, PUT /customers/:id, DELETE /customers/:id dengan validasi Zod nama/phone/address/area_id/odp_id, validasi kecocokan area-odp, proteksi 409 Conflict jika pelanggan memiliki tiket, dan isolasi tenantId) selesai - Seluruh pengujian create, update, 409 conflict, delete, dan 404 lolos - Task berikutnya: T82.
 
