@@ -219,7 +219,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T76** Flutter dashboard: domain + data. Commit: `feat(dashboard): add dashboard domain and data layers`
 - [x] **T77** Flutter dashboard: halaman dan kartu ringkasan. Commit: `feat(dashboard): add summary cards`
 - [x] **T78** Flutter dashboard: grafik batang gangguan per area (`fl_chart`). Commit: `feat(dashboard): add area chart`
-- [ ] **T79** Flutter dashboard: kinerja per vendor (daftar atau grafik). Commit: `feat(dashboard): add vendor performance section`
+- [x] **T79** Flutter dashboard: kinerja per vendor (daftar atau grafik). Commit: `feat(dashboard): add vendor performance section`
 
 ## Fase 9 - CRUD data master di aplikasi (prioritas rendah; potong dulu jika waktu mepet) (branch: `feature/master-crud`)
 - [ ] **T80** Backend area: `POST`, `PUT`, `DELETE` (hapus ditolak 409 jika dipakai). Commit: `feat(master): add area write endpoints`
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-18 - T79 - Flutter Dashboard: komponen kinerja vendor (VendorPerformanceSection dengan metrik total ditangani, diselesaikan, tiket aktif, durasi rata-rata pengerjaan, persentase kepatuhan SLA dengan indikator warna, status kosong) terintegrasi di DashboardPage selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Seluruh rangkaian Fase 8 (T71-T79) selesai.
 
 - 2026-11-18 - T78 - Flutter Dashboard: grafik batang gangguan per area (AreaBarChartSection dengan fl_chart BarChart, visualisasi total tiket, selesai, dan tiket aktif per area jaringan, tooltip interaktif, legend, responsif tema) terintegrasi di DashboardPage selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Task berikutnya: T79.
 

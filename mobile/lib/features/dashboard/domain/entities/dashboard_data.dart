@@ -58,6 +58,8 @@ class DashboardVendor extends Equatable {
   final double avgResolutionHours;
   final double slaCompliancePercentage;
 
+  int get activeTickets => totalTickets - resolvedTickets;
+
   const DashboardVendor({
     required this.vendorId,
     required this.vendorName,

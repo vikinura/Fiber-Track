@@ -11,6 +11,7 @@ import '../bloc/dashboard_event.dart';
 import '../bloc/dashboard_state.dart';
 import '../widgets/area_bar_chart_section.dart';
 import '../widgets/summary_cards_section.dart';
+import '../widgets/vendor_performance_section.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -76,6 +77,8 @@ class DashboardView extends StatelessWidget {
                     SummaryCardsSection(summary: state.summary),
                     const SizedBox(height: AppSizes.p24),
                     AreaBarChartSection(areas: state.areas),
+                    const SizedBox(height: AppSizes.p24),
+                    VendorPerformanceSection(vendors: state.vendors),
                     const SizedBox(height: AppSizes.p24),
                   ],
                 ),
