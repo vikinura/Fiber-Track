@@ -23,6 +23,18 @@ async function runSeed() {
       }
     }
 
+    // If seedSampleTickets exists, run it
+    try {
+      const { seedSampleTickets } = await import('./seeds/003_sample_tickets_seed.js');
+      if (typeof seedSampleTickets === 'function') {
+        await seedSampleTickets(connection);
+      }
+    } catch (e) {
+      if (e.code !== 'ERR_MODULE_NOT_FOUND') {
+        throw e;
+      }
+    }
+
     await connection.commit();
     console.log('--- Database Seeding Completed Successfully ---');
   } catch (error) {

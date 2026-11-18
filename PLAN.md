@@ -211,7 +211,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T70** Flutter: tampilkan `sla_status` dan sisa waktu di daftar dan detail tiket. Commit: `feat(sla): show sla status in ticket screens`
 
 ## Fase 8 - Dashboard (branch: `feature/dashboard`)
-- [ ] **T71** Seed 3: tiket contoh di berbagai status dan SLA (termasuk `at_risk`, `overdue`, `breached`). Commit: `feat(db): seed sample tickets`
+- [x] **T71** Seed 3: tiket contoh di berbagai status dan SLA (termasuk `at_risk`, `overdue`, `breached`). Commit: `feat(db): seed sample tickets`
 - [ ] **T72** Backend `GET /dashboard/summary` (jumlah per status, overdue, rata-rata durasi, persentase SLA terpenuhi). Commit: `feat(dashboard): add summary endpoint`
 - [ ] **T73** Backend `GET /dashboard/by-area`. Commit: `feat(dashboard): add by-area endpoint`
 - [ ] **T74** Backend `GET /dashboard/by-vendor`. Commit: `feat(dashboard): add by-vendor endpoint`
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-18 - T71 - Seed 3 (003_sample_tickets_seed.js) memuat tiket contoh berbagai status (new, forwarded, assigned, in_progress, resolved) dan SLA (on_track, at_risk, overdue, met, breached) serta riwayatnya selesai - Teruji npm run seed berjalan lancar dan idempotent - Task berikutnya: T72.
 
 - 2026-11-17 - T70 - Flutter penyajian visual status SLA dan sisa waktu pengerjaan di layar daftar tiket (_TicketCard) dan detail tiket (TicketDetailPage) dengan indikator SlaBadge (aman/mendekati batas/telat/terpenuhi/melebihi batas) selesai - flutter analyze (0 issue) dan test lolos - Task berikutnya: T71 (Fase 8: Dashboard).
 
