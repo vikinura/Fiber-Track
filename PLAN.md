@@ -234,7 +234,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T87** Unit test tambahan: validators, SLA, use case utama. Commit: `test: add unit tests for validators, sla and use cases`
 - [x] **T88** Tabel pengujian black box di `docs/pengujian.md` + tangkapan layar di `docs/screenshots/`. Commit: `docs: add black box test results and screenshots`
 - [x] **T89** Postman final: jalankan 9 tes isolasi, simpan hasil, ekspor koleksi. Commit: `docs: finalize postman collection and isolation results`
-- [ ] **T90** README final: deskripsi, arsitektur, cara menjalankan backend dan mobile, akun demo, daftar endpoint. Commit: `docs: finalize readme`
+- [x] **T90** README final: deskripsi, arsitektur, cara menjalankan backend dan mobile, akun demo, daftar endpoint. Commit: `docs: finalize readme`
 - [ ] **T91** (opsional) Ikon aplikasi dan splash screen. Commit: `feat(mobile): add app icon and splash screen`
 - [ ] **T92** Build APK release dan uji di perangkat nyata. Commit: `chore(mobile): prepare release build`
 - [ ] **T93** Tag rilis `v1.0.0`. Commit/tag: `chore: release v1.0.0`
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-19 - T90 - Penyusunan README.md final yang komprehensif: deskripsi platform, arsitektur teknis (Clean Architecture Flutter & Layered Node.js), tabel akun demo seluruh peran, panduan setup backend & database, cara menjalankan mobile, ringkasan endpoint REST API, dan referensi berkas pengujian selesai - Task berikutnya: T91.
 
 - 2026-11-19 - T89 - Verifikasi final dan dokumentasi lengkap 9 kasus uji isolasi multi-tenant/peran (isolasi tiket lintas tenant, kemitraan vendor, penugasan teknisi, hak akses status, pencegahan lompat status, autentikasi rusak, dan pencegahan parameter tampering) di docs/pengujian.md dan sinkronisasi koleksi Postman docs/postman/ selesai - Seluruh 9 skenario PASS 100% - Task berikutnya: T90.
 
