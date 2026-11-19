@@ -79,3 +79,36 @@ Lingkungan pengujian: Localhost REST API (Node.js Express + MySQL)
 | Rekap Per Vendor | `tenant_admin` | `GET /dashboard/by-vendor` | 200 OK | 200 OK | **Lolos (PASS)** |
 | Akses Dashboard Non-Tenant | `vendor_admin` | `GET /dashboard/summary` | 403 Forbidden | 403 Forbidden | **Lolos (PASS)** |
 | Akses Dashboard Tanpa Token | Tamu (Public) | `GET /dashboard/summary` | 401 Unauthorized | 401 Unauthorized | **Lolos (PASS)** |
+
+---
+
+## Tabel Pengujian Black Box Aplikasi Mobile (Fase 10 - Task T88)
+
+Tanggal pengujian: 2026-11-19  
+Lingkungan pengujian: Android Emulator / Pixel 6 (API 34) & Flutter Test Suite  
+Metode: Black Box Testing (Equivalence Partitioning & Boundary Value Analysis)
+
+| ID | Modul / Fitur | Skenario Pengujian | Masukan (Input) | Hasil yang Diharapkan | Hasil Pengujian | Status |
+|:---|:---|:---|:---|:---|:---|:---:|
+| **BB-01** | Autentikasi | Login dengan kredensial kosong | Email & Password kosong | Muncul pesan error validasi pada field formulir | Sesuai | **PASS** |
+| **BB-02** | Autentikasi | Login format email salah | `admin.nusa` (tanpa domain) | Validasi menolak: "Format email tidak valid" | Sesuai | **PASS** |
+| **BB-03** | Autentikasi | Login password salah | Password keliru | SnackBar error server: "Email atau password salah" | Sesuai | **PASS** |
+| **BB-04** | Autentikasi | Login peran super admin | Akun `superadmin@fibertrack.id` | Ditolak oleh guard aplikasi mobile | Sesuai | **PASS** |
+| **BB-05** | Autentikasi | Login sukses tenant admin | `admin.nusa@fibertrack.id` | Masuk ke Beranda Admin Tenant, token JWT tersimpan aman | Sesuai | **PASS** |
+| **BB-06** | Pengaturan | Ganti tema aplikasi | Pilih Mode Terang / Gelap / Sistem | Tema aplikasi berubah seketika, tersimpan di SharedPreferences | Sesuai | **PASS** |
+| **BB-07** | Pengaturan | Konfirmasi keluar (Logout) | Klik Logout -> Konfirmasi Batal / Ya | Sesi JWT dihapus, router mengarahkan ke halaman login | Sesuai | **PASS** |
+| **BB-08** | Tiket Gangguan | Buat tiket deskripsi < 10 karakter | Deskripsi 5 karakter | Validasi formulir menolak: "Deskripsi minimal 10 karakter" | Sesuai | **PASS** |
+| **BB-09** | Tiket Gangguan | Buat tiket sukses | Pelanggan, Area, ODP, Jenis, Prioritas valid | Tiket baru terbuat, nomor TKT terbit, SLA dihitung otomatis | Sesuai | **PASS** |
+| **BB-10** | Tiket Gangguan | Cari tiket dan filter status | Query nama / nomor & filter `in_progress` | Daftar menampilkan tiket yang sesuai secara instan | Sesuai | **PASS** |
+| **BB-11** | Tiket Gangguan | Tampilan SLA Badge | Tiket overdue / on track | Badge menampilkan warna, teks status, dan countdown waktu | Sesuai | **PASS** |
+| **BB-12** | Alur Kerja | Teruskan tiket ke vendor | Pilih Mitra Vendor aktif | Status tiket berubah jadi `forwarded`, notifikasi terkirim | Sesuai | **PASS** |
+| **BB-13** | Alur Kerja | Tugaskan teknisi lapangan | Pilih Teknisi vendor | Status tiket berubah jadi `assigned`, notifikasi terkirim | Sesuai | **PASS** |
+| **BB-14** | Alur Kerja | Mulai pengerjaan tiket | Klik Mulai Pengerjaan | Status tiket menjadi `in_progress`, tombol unggah foto aktif | Sesuai | **PASS** |
+| **BB-15** | Alur Kerja | Selesaikan tiket tanpa catatan | Klik Selesaikan tanpa catatan | Validasi menolak: "Catatan wajib diisi minimal 5 karakter" | Sesuai | **PASS** |
+| **BB-16** | Bukti Foto | Unggah foto bukti gangguan | Pilih gambar dari galeri / kamera | Foto terunggah, muncul di galeri detail tiket | Sesuai | **PASS** |
+| **BB-17** | Notifikasi | Polling & tandai telah dibaca | Buka halaman notifikasi -> klik item | Badge unread di NavigationBar berkurang, status terbaca | Sesuai | **PASS** |
+| **BB-18** | Dashboard | Muat ringkasan & grafik area | Buka menu Dashboard | Kartu metrik, bar chart per area, performa vendor tampil akurat | Sesuai | **PASS** |
+| **BB-19** | Master Area | Tambah & hapus area | Buat area baru -> Hapus area | Area berhasil dibuat dan terhapus saat tidak ada keterikatan data | Sesuai | **PASS** |
+| **BB-20** | Master Area | Hapus area yang sedang digunakan | Hapus area dengan relasi tiket/ODP | Muncul pesan error proteksi konflik data (409) | Sesuai | **PASS** |
+| **BB-21** | Master Pelanggan | Tambah pelanggan & validasi ODP | Pilih area dan ODP yang sesuai | Pelanggan tersimpan dengan pemetaan area & ODP yang valid | Sesuai | **PASS** |
+
