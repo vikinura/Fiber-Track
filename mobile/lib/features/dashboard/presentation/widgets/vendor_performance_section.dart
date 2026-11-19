@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/theme/status_colors.dart';
 import '../../domain/entities/dashboard_data.dart';
 
 class VendorPerformanceSection extends StatelessWidget {
@@ -72,8 +73,13 @@ class VendorPerformanceSection extends StatelessWidget {
 
   Widget _buildVendorCard(BuildContext context, DashboardVendor vendor) {
     final theme = Theme.of(context);
+    final statusColors = theme.extension<StatusColors>();
+    final resolvedColor =
+        statusColors?.statusResolved ?? theme.colorScheme.secondary;
     final isGoodSla = vendor.slaCompliancePercentage >= 80.0;
-    final slaColor = isGoodSla ? Colors.teal : theme.colorScheme.error;
+    final slaColor = isGoodSla
+        ? (statusColors?.slaSafe ?? theme.colorScheme.primary)
+        : theme.colorScheme.error;
 
     return Card(
       elevation: 0,
@@ -165,7 +171,7 @@ class VendorPerformanceSection extends StatelessWidget {
                   label: AppStrings.resolvedTickets,
                   value: '${vendor.resolvedTickets}',
                   icon: Icons.task_alt_rounded,
-                  iconColor: Colors.teal,
+                  iconColor: resolvedColor,
                 ),
                 Container(
                   height: 30,

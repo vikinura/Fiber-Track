@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/theme/status_colors.dart';
 import '../../domain/entities/dashboard_data.dart';
 import 'summary_metric_card.dart';
 
@@ -13,6 +14,7 @@ class SummaryCardsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final statusColors = theme.extension<StatusColors>();
     final activeCount =
         (summary.byStatus['forwarded'] ?? 0) +
         (summary.byStatus['assigned'] ?? 0) +
@@ -57,7 +59,7 @@ class SummaryCardsSection extends StatelessWidget {
               subtitle: 'Kepatuhan target',
               icon: Icons.verified_outlined,
               color: summary.slaCompliancePercentage >= 80
-                  ? Colors.teal
+                  ? (statusColors?.slaSafe ?? theme.colorScheme.primary)
                   : theme.colorScheme.error,
             ),
           ],
@@ -144,31 +146,40 @@ class SummaryCardsSection extends StatelessWidget {
                       context,
                       label: 'Baru',
                       count: summary.byStatus['new'] ?? 0,
-                      color: Colors.blue,
+                      color:
+                          statusColors?.statusNew ?? theme.colorScheme.primary,
                     ),
                     _buildStatusItem(
                       context,
                       label: 'Diteruskan',
                       count: summary.byStatus['forwarded'] ?? 0,
-                      color: Colors.orange,
+                      color:
+                          statusColors?.statusForwarded ??
+                          theme.colorScheme.secondary,
                     ),
                     _buildStatusItem(
                       context,
                       label: 'Ditugaskan',
                       count: summary.byStatus['assigned'] ?? 0,
-                      color: Colors.purple,
+                      color:
+                          statusColors?.statusAssigned ??
+                          theme.colorScheme.tertiary,
                     ),
                     _buildStatusItem(
                       context,
                       label: 'Dikerjakan',
                       count: summary.byStatus['in_progress'] ?? 0,
-                      color: Colors.amber.shade800,
+                      color:
+                          statusColors?.statusInProgress ??
+                          theme.colorScheme.primary,
                     ),
                     _buildStatusItem(
                       context,
                       label: 'Selesai',
                       count: summary.byStatus['resolved'] ?? 0,
-                      color: Colors.green,
+                      color:
+                          statusColors?.statusResolved ??
+                          theme.colorScheme.secondary,
                     ),
                   ],
                 ),

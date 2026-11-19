@@ -229,7 +229,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T84** Flutter: kelola pelanggan (daftar + form + hapus). Commit: `feat(master): add customer management screens`
 
 ## Fase 10 - Penyelesaian (branch: `feature/finishing`)
-- [ ] **T85** Periksa semua layar di mode gelap; cari dan perbaiki warna hard-coded. Commit: `fix(ui): fix dark mode and remove hard-coded colors`
+- [x] **T85** Periksa semua layar di mode gelap; cari dan perbaiki warna hard-coded. Commit: `fix(ui): fix dark mode and remove hard-coded colors`
 - [ ] **T86** Periksa state loading, error, kosong di semua layar. Commit: `fix(ui): complete loading, error and empty states`
 - [ ] **T87** Unit test tambahan: validators, SLA, use case utama. Commit: `test: add unit tests for validators, sla and use cases`
 - [ ] **T88** Tabel pengujian black box di `docs/pengujian.md` + tangkapan layar di `docs/screenshots/`. Commit: `docs: add black box test results and screenshots`
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-19 - T85 - Refactoring tema dan warna: menghapus warna hard-coded (Colors.green/red/orange/blue/teal), integrasi StatusColors extension dan ColorScheme di seluruh halaman (dashboard, kartu ringkasan, bar chart, detail tiket, form tiket), memastikan kontras dan keterbacaan di tema terang dan gelap selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Task berikutnya: T86.
 
 - 2026-11-18 - T84 - Flutter kelola pelanggan (CustomerBloc, CustomerListPage dengan pencarian & refresh, CustomerFormDialog dengan dropdown area dan ODP terfilter dinamis, validasi nama/telepon/alamat, konfirmasi hapus, rute /master/customers, registrasi DI, integrasi di RoleHomePage) selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Seluruh rangkaian Fase 9 (T80-T84) selesai.
 

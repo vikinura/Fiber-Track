@@ -44,7 +44,6 @@ class TicketFormPage extends StatelessWidget {
                         ? 'Tiket berhasil diperbarui'
                         : 'Tiket berhasil dibuat: ${state.ticket.ticketNo}',
                   ),
-                  backgroundColor: Colors.green,
                 ),
               );
               context.pop(true);
@@ -53,7 +52,7 @@ class TicketFormPage extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.submitErrorMessage!),
-                  backgroundColor: Colors.red,
+                  backgroundColor: Theme.of(context).colorScheme.error,
                 ),
               );
             }

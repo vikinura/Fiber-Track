@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/theme/status_colors.dart';
 import '../../domain/entities/dashboard_data.dart';
 
 class AreaBarChartSection extends StatelessWidget {
@@ -13,6 +14,9 @@ class AreaBarChartSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final statusColors = theme.extension<StatusColors>();
+    final resolvedColor =
+        statusColors?.statusResolved ?? theme.colorScheme.secondary;
 
     if (areas.isEmpty) {
       return Card(
@@ -87,7 +91,7 @@ class AreaBarChartSection extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSizes.p16),
                 _buildLegendItem(
-                  color: Colors.teal,
+                  color: resolvedColor,
                   label: 'Selesai',
                   textStyle: theme.textTheme.bodySmall,
                 ),
@@ -217,7 +221,7 @@ class AreaBarChartSection extends StatelessWidget {
                         ),
                         BarChartRodData(
                           toY: area.resolvedTickets.toDouble(),
-                          color: Colors.teal,
+                          color: resolvedColor,
                           width: 10,
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(AppSizes.r4),

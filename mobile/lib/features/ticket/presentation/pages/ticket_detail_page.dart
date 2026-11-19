@@ -40,16 +40,13 @@ class TicketDetailPage extends StatelessWidget {
             if (state is TicketDetailLoaded) {
               if (state.actionSuccessMessage != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.actionSuccessMessage!),
-                    backgroundColor: Colors.green,
-                  ),
+                  SnackBar(content: Text(state.actionSuccessMessage!)),
                 );
               } else if (state.actionErrorMessage != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.actionErrorMessage!),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Theme.of(context).colorScheme.error,
                   ),
                 );
               }
@@ -297,8 +294,12 @@ class _TicketDetailContent extends StatelessWidget {
                           }
                         },
                         style: FilledButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .tertiary,
+                          foregroundColor: Theme.of(context)
+                              .colorScheme
+                              .onTertiary,
                         ),
                         icon: const Icon(Icons.play_arrow_rounded, size: 18),
                         label: const Text('Mulai Pengerjaan'),
@@ -349,8 +350,12 @@ class _TicketDetailContent extends StatelessWidget {
                           }
                         },
                         style: FilledButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .primary,
+                          foregroundColor: Theme.of(context)
+                              .colorScheme
+                              .onPrimary,
                         ),
                         icon: const Icon(Icons.check_circle_outline, size: 18),
                         label: const Text('Selesaikan Tiket'),
