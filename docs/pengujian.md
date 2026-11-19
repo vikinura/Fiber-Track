@@ -77,8 +77,34 @@ Lingkungan pengujian: Localhost REST API (Node.js Express + MySQL)
 | Ringkasan Dashboard | `tenant_admin` | `GET /dashboard/summary` | 200 OK | 200 OK | **Lolos (PASS)** |
 | Rekap Per Area | `tenant_admin` | `GET /dashboard/by-area` | 200 OK | 200 OK | **Lolos (PASS)** |
 | Rekap Per Vendor | `tenant_admin` | `GET /dashboard/by-vendor` | 200 OK | 200 OK | **Lolos (PASS)** |
-| Akses Dashboard Non-Tenant | `vendor_admin` | `GET /dashboard/summary` | 403 Forbidden | 403 Forbidden | **Lolos (PASS)** |
-| Akses Dashboard Tanpa Token | Tamu (Public) | `GET /dashboard/summary` | 401 Unauthorized | 401 Unauthorized | **Lolos (PASS)** |
+---
+
+## Rekapitulasi Final Pengujian 9 Kasus Isolasi Hak Akses & Multi-Tenant (Fase 10 - Task T89)
+
+Tanggal verifikasi final: 2026-11-19  
+Lingkungan pengujian: Localhost REST API (Node.js Express + MySQL)  
+Koleksi Postman: `docs/postman/`
+
+Sesuai spesifikasi `CONTEXT.md` Bagian 18, seluruh 9 kasus pengujian isolasi hak akses, multi-tenancy, dan workflow wajib diuji dan dipastikan lolos:
+
+| No | Kasus Uji | Skenario Pengujian | Input / Header | Expected Status | Actual Status | Hasil |
+|:---:|:---|:---|:---|:---:|:---:|:---:|
+| **1** | Isolasi Tiket Lintas Tenant | Admin Tenant B membaca tiket milik Tenant A | `GET /api/v1/tickets/1` (Token Tenant B) | **404 Not Found** | 404 Not Found | **Lolos (PASS)** |
+| **2** | Kemitraan Tenant-Vendor | Admin Tenant meneruskan tiket ke vendor tanpa relasi kemitraan aktif | `PATCH /api/v1/tickets/2/forward` (body `vendor_id: 999`) | **422 Unprocessable** | 422 Unprocessable | **Lolos (PASS)** |
+| **3** | Isolasi Tiket Antar Vendor | Admin Vendor 2 membaca tiket yang ditugaskan ke Vendor 1 | `GET /api/v1/tickets/:idV1` (Token Vendor 2) | **404 Not Found** | 404 Not Found | **Lolos (PASS)** |
+| **4** | Penugasan Teknisi Lintas Vendor | Admin Vendor 1 menugaskan teknisi milik Vendor 2 | `PATCH /api/v1/tickets/2/assign` (body `technician_id: 6`) | **422 Unprocessable** | 422 Unprocessable | **Lolos (PASS)** |
+| **5** | Isolasi Tiket Antar Teknisi | Teknisi membaca tiket yang bukan menjadi tugas dirinya | `GET /api/v1/tickets/:idOther` (Token Teknisi) | **404 Not Found** | 404 Not Found | **Lolos (PASS)** |
+| **6** | Otorisasi Teknisi pada Status | Teknisi mencoba mengubah status tiket milik orang lain | `PATCH /api/v1/tickets/:idOther/status` | **404 Not Found** | 404 Not Found | **Lolos (PASS)** |
+| **7** | Pencegahan Lompat Transisi Status | Teknisi mencoba mengubah tiket status `new`/`assigned` langsung ke `resolved` | `PATCH /api/v1/tickets/:id/status` (to: `resolved`) | **409 Conflict** | 409 Conflict | **Lolos (PASS)** |
+| **8** | Autentikasi Tanpa / Token Rusak | Request endpoint terproteksi tanpa header Authorization atau token cacat | `GET /api/v1/tickets/1` (Token rusak) | **401 Unauthorized** | 401 Unauthorized | **Lolos (PASS)** |
+| **9** | Pencegahan Parameter Tampering | Request pembuatan tiket menyisipkan `tenant_id: 999` palsu di body | `POST /api/v1/tickets` (body `tenant_id: 999`) | **201 Created** (`tenant_id: 1` dari JWT) | 201 Created (`tenant_id: 1`) | **Lolos (PASS)** |
+
+### Kesimpulan Final Pengujian
+Seluruh 9 kasus uji isolasi multi-tenant dan hak akses peran berhasil diverifikasi dan terbukti aman:
+- Data antar-tenant tidak pernah bocor (mengembalikan 404).
+- Keamanan berbasis token JWT berjalan tanpa celah spoofing parameter.
+- Aturan integritas workflow operasional tiket ditaati sepenuhnya oleh backend dan mobile client.
+
 
 ---
 
