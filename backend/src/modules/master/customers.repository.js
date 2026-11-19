@@ -45,6 +45,73 @@ export class CustomerRepository {
       },
     };
   }
+
+  async findByIdAndTenantId(id, tenantId) {
+    const query = `
+      SELECT 
+        c.id, c.tenant_id, c.area_id, c.odp_id, c.name, c.address, c.phone,
+        a.name AS area_name,
+        o.code AS odp_code
+      FROM customers c
+      LEFT JOIN areas a ON c.area_id = a.id
+      LEFT JOIN odps o ON c.odp_id = o.id
+      WHERE c.id = ? AND c.tenant_id = ?
+      LIMIT 1
+    `;
+    const [rows] = await pool.query(query, [id, tenantId]);
+    return rows[0] || null;
+  }
+
+  async create(tenantId, { name, phone, address, area_id, odp_id }) {
+    const query = `
+      INSERT INTO customers (tenant_id, name, phone, address, area_id, odp_id)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await pool.query(query, [
+      tenantId,
+      name,
+      phone || null,
+      address || null,
+      area_id || null,
+      odp_id || null,
+    ]);
+    return this.findByIdAndTenantId(result.insertId, tenantId);
+  }
+
+  async update(id, tenantId, { name, phone, address, area_id, odp_id }) {
+    const query = `
+      UPDATE customers
+      SET name = ?, phone = ?, address = ?, area_id = ?, odp_id = ?
+      WHERE id = ? AND tenant_id = ?
+    `;
+    await pool.query(query, [
+      name,
+      phone || null,
+      address || null,
+      area_id || null,
+      odp_id || null,
+      id,
+      tenantId,
+    ]);
+    return this.findByIdAndTenantId(id, tenantId);
+  }
+
+  async delete(id, tenantId) {
+    const query = `
+      DELETE FROM customers
+      WHERE id = ? AND tenant_id = ?
+    `;
+    const [result] = await pool.query(query, [id, tenantId]);
+    return result.affectedRows > 0;
+  }
+
+  async isUsed(id, tenantId) {
+    const [ticketRows] = await pool.query(
+      'SELECT id FROM tickets WHERE customer_id = ? AND tenant_id = ? LIMIT 1',
+      [id, tenantId]
+    );
+    return ticketRows.length > 0;
+  }
 }
 
 export default new CustomerRepository();

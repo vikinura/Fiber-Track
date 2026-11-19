@@ -218,6 +218,28 @@ class RoleHomePage extends StatelessWidget {
                           label: const Text('Buka Dashboard Rekap'),
                         ),
                       ),
+                      const SizedBox(height: AppSizes.p12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            context.push('/master/areas');
+                          },
+                          icon: const Icon(Icons.map_outlined),
+                          label: const Text('Kelola Area Jaringan'),
+                        ),
+                      ),
+                      const SizedBox(height: AppSizes.p12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            context.push('/master/customers');
+                          },
+                          icon: const Icon(Icons.people_outline_rounded),
+                          label: const Text('Kelola Data Pelanggan'),
+                        ),
+                      ),
                     ],
                   ],
                 ),

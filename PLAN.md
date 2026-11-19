@@ -222,11 +222,11 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T79** Flutter dashboard: kinerja per vendor (daftar atau grafik). Commit: `feat(dashboard): add vendor performance section`
 
 ## Fase 9 - CRUD data master di aplikasi (prioritas rendah; potong dulu jika waktu mepet) (branch: `feature/master-crud`)
-- [ ] **T80** Backend area: `POST`, `PUT`, `DELETE` (hapus ditolak 409 jika dipakai). Commit: `feat(master): add area write endpoints`
-- [ ] **T81** Backend pelanggan: `POST`, `PUT`, `DELETE`. Commit: `feat(master): add customer write endpoints`
-- [ ] **T82** Backend ODP, jenis gangguan, prioritas: `POST`, `PUT`, `DELETE`. Commit: `feat(master): add odp, issue type and priority write endpoints`
-- [ ] **T83** Flutter: kelola area (daftar + form + hapus). Commit: `feat(master): add area management screens`
-- [ ] **T84** Flutter: kelola pelanggan (daftar + form + hapus). Commit: `feat(master): add customer management screens`
+- [x] **T80** Backend area: `POST`, `PUT`, `DELETE` (hapus ditolak 409 jika dipakai). Commit: `feat(master): add area write endpoints`
+- [x] **T81** Backend pelanggan: `POST`, `PUT`, `DELETE`. Commit: `feat(master): add customer write endpoints`
+- [x] **T82** Backend ODP, jenis gangguan, prioritas: `POST`, `PUT`, `DELETE`. Commit: `feat(master): add odp, issue type and priority write endpoints`
+- [x] **T83** Flutter: kelola area (daftar + form + hapus). Commit: `feat(master): add area management screens`
+- [x] **T84** Flutter: kelola pelanggan (daftar + form + hapus). Commit: `feat(master): add customer management screens`
 
 ## Fase 10 - Penyelesaian (branch: `feature/finishing`)
 - [ ] **T85** Periksa semua layar di mode gelap; cari dan perbaiki warna hard-coded. Commit: `fix(ui): fix dark mode and remove hard-coded colors`
@@ -251,6 +251,16 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-18 - T84 - Flutter kelola pelanggan (CustomerBloc, CustomerListPage dengan pencarian & refresh, CustomerFormDialog dengan dropdown area dan ODP terfilter dinamis, validasi nama/telepon/alamat, konfirmasi hapus, rute /master/customers, registrasi DI, integrasi di RoleHomePage) selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Seluruh rangkaian Fase 9 (T80-T84) selesai.
+
+- 2026-11-18 - T83 - Flutter kelola area jaringan (use cases CreateArea/UpdateArea/DeleteArea, remote data source CRUD, repository impl, AreaBloc, AreaListPage, dialog AreaFormDialog, konfirmasi hapus, rute /master/areas, integrasi di RoleHomePage) selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Task berikutnya: T84.
+
+- 2026-11-18 - T82 - Backend endpoint write ODP (POST, PUT, DELETE /odps), Jenis Gangguan (POST, PUT, DELETE /issue-types), dan Prioritas (POST, PUT, DELETE /priorities) dengan skema validasi Zod, proteksi 409 Conflict jika entitas digunakan di tiket/pelanggan, dan isolasi tenantId selesai - Seluruh pengujian create, update, 409 conflict, delete berhasil lolos - Task berikutnya: T83.
+
+- 2026-11-18 - T81 - Backend endpoint write pelanggan (POST /customers, PUT /customers/:id, DELETE /customers/:id dengan validasi Zod nama/phone/address/area_id/odp_id, validasi kecocokan area-odp, proteksi 409 Conflict jika pelanggan memiliki tiket, dan isolasi tenantId) selesai - Seluruh pengujian create, update, 409 conflict, delete, dan 404 lolos - Task berikutnya: T82.
+
+- 2026-11-18 - T80 - Backend endpoint write area (POST /areas, PUT /areas/:id, DELETE /areas/:id dengan proteksi 409 Conflict jika area berelasi ke tickets/odps/customers, validasi Zod, dan cakupan tenantId) selesai - Seluruh pengujian create, update, 409 conflict, delete, dan 404 lolos - Task berikutnya: T81.
 
 - 2026-11-18 - T79 - Flutter Dashboard: komponen kinerja vendor (VendorPerformanceSection dengan metrik total ditangani, diselesaikan, tiket aktif, durasi rata-rata pengerjaan, persentase kepatuhan SLA dengan indikator warna, status kosong) terintegrasi di DashboardPage selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Seluruh rangkaian Fase 8 (T71-T79) selesai.
 
