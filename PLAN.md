@@ -237,7 +237,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 - [x] **T90** README final: deskripsi, arsitektur, cara menjalankan backend dan mobile, akun demo, daftar endpoint. Commit: `docs: finalize readme`
 - [x] **T91** (opsional) Ikon aplikasi dan splash screen. Commit: `feat(mobile): add app icon and splash screen`
 - [x] **T92** Build APK release dan uji di perangkat nyata. Commit: `chore(mobile): prepare release build`
-- [ ] **T93** Tag rilis `v1.0.0`. Commit/tag: `chore: release v1.0.0`
+- [x] **T93** Tag rilis `v1.0.0`. Commit/tag: `chore: release v1.0.0`
 
 ---
 
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-19 - T93 - Tagging release v1.0.0 (pembuatan tag git annotated v1.0.0 "Release version 1.0.0", penyelesaian seluruh 93 task di PLAN.md dari Fase 1 hingga Fase 10, penutupan seluruh milestone pengembangan Fiber Track) selesai - Status: Seluruh fase pengerjaan selesai 100%.
 
 - 2026-11-19 - T92 - Penyiapan build release mobile (pembaruan AndroidManifest.xml dengan izin INTERNET & label 'Fiber Track', verifikasi build.gradle.kts release signing & minSdk/targetSdk, konfirmasi dart format, flutter analyze 0 issues, dan 13/13 tests lolos) selesai - Task berikutnya: T93.
 
