@@ -230,7 +230,7 @@ Kirim: `Selesaikan task yang sedang berjalan sampai ter-commit, lalu berhenti. J
 
 ## Fase 10 - Penyelesaian (branch: `feature/finishing`)
 - [x] **T85** Periksa semua layar di mode gelap; cari dan perbaiki warna hard-coded. Commit: `fix(ui): fix dark mode and remove hard-coded colors`
-- [ ] **T86** Periksa state loading, error, kosong di semua layar. Commit: `fix(ui): complete loading, error and empty states`
+- [x] **T86** Periksa state loading, error, kosong di semua layar. Commit: `fix(ui): complete loading, error and empty states`
 - [ ] **T87** Unit test tambahan: validators, SLA, use case utama. Commit: `test: add unit tests for validators, sla and use cases`
 - [ ] **T88** Tabel pengujian black box di `docs/pengujian.md` + tangkapan layar di `docs/screenshots/`. Commit: `docs: add black box test results and screenshots`
 - [ ] **T89** Postman final: jalankan 9 tes isolasi, simpan hasil, ekspor koleksi. Commit: `docs: finalize postman collection and isolation results`
@@ -251,6 +251,8 @@ Kerjakan sedikit-sedikit di sela fase, dan simpan draf di `docs/` bila ingin iku
 
 ## Catatan serah terima
 (Diisi AI setelah setiap task. Entri terbaru di atas. Format: `Tanggal - Txx - apa yang selesai - keputusan/kendala - task berikutnya`.)
+
+- 2026-11-19 - T86 - Audit dan kelengkapan penanganan state antarmuka: memastikan seluruh 8 layar utama (Login, Beranda Peran, Daftar Tiket, Detail Tiket, Form Tiket, Dashboard, Notifikasi, Pengaturan, Kelola Area, Kelola Pelanggan) memiliki penanganan LoadingView, ErrorView (dengan aksi onRetry), dan EmptyView (dengan aksi tombol/refresh) yang konsisten - flutter analyze (0 issue) dan flutter test (6/6 pass) - Task berikutnya: T87.
 
 - 2026-11-19 - T85 - Refactoring tema dan warna: menghapus warna hard-coded (Colors.green/red/orange/blue/teal), integrasi StatusColors extension dan ColorScheme di seluruh halaman (dashboard, kartu ringkasan, bar chart, detail tiket, form tiket), memastikan kontras dan keterbacaan di tema terang dan gelap selesai - flutter analyze (0 issue) dan flutter test (6/6 pass) - Task berikutnya: T86.
 
