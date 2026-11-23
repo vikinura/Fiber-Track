@@ -42,6 +42,9 @@ class _TicketPhotoGalleryState extends State<TicketPhotoGallery> {
   }
 
   String _getPhotoUrl(int photoId) {
+    if (_token != null && _token!.isNotEmpty) {
+      return '${AppConfig.apiBaseUrl}/tickets/photos/$photoId?token=$_token';
+    }
     return '${AppConfig.apiBaseUrl}/tickets/photos/$photoId';
   }
 

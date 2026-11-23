@@ -4,12 +4,18 @@ import { config } from '../config/env.js';
 
 export function auth(req, res, next) {
   const authHeader = req.headers.authorization;
+  let token = null;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return next(new UnauthorizedError('Token otentikasi tidak ditemukan'));
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.query && req.query.token) {
+    // Dukungan token via query parameter untuk elemen HTML img / Flutter Web image tags
+    token = req.query.token;
   }
 
-  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return next(new UnauthorizedError('Token otentikasi tidak ditemukan'));
+  }
 
   try {
     const decoded = jwt.verify(token, config.jwt.secret);

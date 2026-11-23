@@ -13,7 +13,9 @@ import dashboardRoutes from './modules/dashboard/dashboard.routes.js';
 const app = express();
 
 // Security middlewares
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 app.use(cors({
   origin: '*', // can be restricted to specific frontend origins or allow local emulator
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
