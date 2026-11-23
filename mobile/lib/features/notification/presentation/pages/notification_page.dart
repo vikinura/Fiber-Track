@@ -15,7 +15,11 @@ class NotificationPage extends StatelessWidget {
   const NotificationPage({super.key});
 
   String _formatDateTime(DateTime dt) {
-    return DateFormat('dd MMM yyyy, HH:mm', 'id_ID').format(dt.toLocal());
+    try {
+      return DateFormat('dd MMM yyyy, HH:mm', 'id_ID').format(dt.toLocal());
+    } catch (_) {
+      return DateFormat('dd MMM yyyy, HH:mm').format(dt.toLocal());
+    }
   }
 
   @override
