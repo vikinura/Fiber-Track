@@ -253,8 +253,10 @@ class _TicketDetailContent extends StatelessWidget {
                 ],
                 if (ticket.status == TicketStatus.assigned) ...[
                   const Divider(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       OutlinedButton.icon(
                         onPressed: () {
@@ -275,7 +277,6 @@ class _TicketDetailContent extends StatelessWidget {
                         icon: const Icon(Icons.add_a_photo_outlined, size: 18),
                         label: const Text('Unggah Foto'),
                       ),
-                      const SizedBox(width: 8),
                       FilledButton.icon(
                         onPressed: () async {
                           final note = await UpdateStatusBottomSheet.show(
@@ -309,8 +310,10 @@ class _TicketDetailContent extends StatelessWidget {
                 ],
                 if (ticket.status == TicketStatus.inProgress) ...[
                   const Divider(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       OutlinedButton.icon(
                         onPressed: () {
@@ -331,7 +334,6 @@ class _TicketDetailContent extends StatelessWidget {
                         icon: const Icon(Icons.add_a_photo_outlined, size: 18),
                         label: const Text('Unggah Foto'),
                       ),
-                      const SizedBox(width: 8),
                       FilledButton.icon(
                         onPressed: () async {
                           final note = await UpdateStatusBottomSheet.show(

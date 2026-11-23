@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -41,7 +40,7 @@ class UploadPhotoBottomSheet extends StatefulWidget {
 class _UploadPhotoBottomSheetState extends State<UploadPhotoBottomSheet> {
   final _picker = ImagePicker();
   final _captionController = TextEditingController();
-  File? _selectedImage;
+  XFile? _selectedImage;
   String? _errorMessage;
 
   @override
@@ -65,16 +64,17 @@ class _UploadPhotoBottomSheetState extends State<UploadPhotoBottomSheet> {
 
       if (pickedFile == null) return;
 
-      final file = File(pickedFile.path);
-      final bytes = await file.length();
+      final bytes = await pickedFile.length();
       final sizeInMb = bytes / (1024 * 1024);
 
       // Validasi ekstensi
-      final lowerPath = pickedFile.path.toLowerCase();
+      final lowerName =
+          (pickedFile.name.isNotEmpty ? pickedFile.name : pickedFile.path)
+              .toLowerCase();
       final isAllowedExt =
-          lowerPath.endsWith('.jpg') ||
-          lowerPath.endsWith('.jpeg') ||
-          lowerPath.endsWith('.png');
+          lowerName.endsWith('.jpg') ||
+          lowerName.endsWith('.jpeg') ||
+          lowerName.endsWith('.png');
 
       if (!isAllowedExt) {
         setState(() {
@@ -92,7 +92,7 @@ class _UploadPhotoBottomSheetState extends State<UploadPhotoBottomSheet> {
       }
 
       setState(() {
-        _selectedImage = file;
+        _selectedImage = pickedFile;
         _errorMessage = null;
       });
     } catch (e) {
@@ -165,12 +165,34 @@ class _UploadPhotoBottomSheetState extends State<UploadPhotoBottomSheet> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(AppSizes.r12),
-                    child: Image.file(
-                      _selectedImage!,
-                      height: 180,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+                    child: kIsWeb
+                        ? Image.network(
+                            _selectedImage!.path,
+                            height: 180,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          )
+                        : FutureBuilder<Uint8List>(
+                            future: _selectedImage!.readAsBytes(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Image.memory(
+                                  snapshot.data!,
+                                  height: 180,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                );
+                              }
+                              return Container(
+                                height: 180,
+                                color:
+                                    theme.colorScheme.surfaceContainerHighest,
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
+                          ),
                   ),
                   IconButton(
                     icon: Container(

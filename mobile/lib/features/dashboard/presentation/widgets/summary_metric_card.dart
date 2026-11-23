@@ -37,10 +37,14 @@ class SummaryMetricCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSizes.r12),
         child: Padding(
-          padding: const EdgeInsets.all(AppSizes.p16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.p12,
+            vertical: AppSizes.p12,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,21 +61,25 @@ class SummaryMetricCard extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.all(AppSizes.p8),
+                    padding: const EdgeInsets.all(AppSizes.p4),
                     decoration: BoxDecoration(
                       color: cardColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(AppSizes.r8),
                     ),
-                    child: Icon(icon, size: 20, color: cardColor),
+                    child: Icon(icon, size: 18, color: cardColor),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSizes.p12),
-              Text(
-                value,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onSurface,
+              const SizedBox(height: AppSizes.p8),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  value,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
               ),
               if (subtitle != null) ...[

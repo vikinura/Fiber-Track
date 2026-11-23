@@ -30,7 +30,7 @@ class SummaryCardsSection extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: AppSizes.p12,
           crossAxisSpacing: AppSizes.p12,
-          childAspectRatio: 1.3,
+          childAspectRatio: 1.05,
           children: [
             SummaryMetricCard(
               title: AppStrings.totalTickets,
