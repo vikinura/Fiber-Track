@@ -153,8 +153,10 @@ class _TicketDetailContent extends StatelessWidget {
                 ),
                 if (ticket.status == TicketStatus.newStatus) ...[
                   const Divider(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       OutlinedButton.icon(
                         onPressed: () {
@@ -166,7 +168,6 @@ class _TicketDetailContent extends StatelessWidget {
                         icon: const Icon(Icons.edit, size: 18),
                         label: const Text('Edit Tiket'),
                       ),
-                      const SizedBox(width: 8),
                       FilledButton.icon(
                         onPressed: () async {
                           final vendorsResult = await getIt<GetVendors>()
