@@ -24,11 +24,17 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
   const allowedExtensions = ['.jpg', '.jpeg', '.png'];
-  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+  const allowedMimeTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/jpg',
+    'application/octet-stream', // Fallback browser MIME ketika Content-Type file tidak terdeteksi otomatis
+  ];
 
   const ext = path.extname(file.originalname).toLowerCase();
   const mime = file.mimetype.toLowerCase();
 
+  // Valid jika ekstensi termasuk JPG/JPEG/PNG dan MIME termasuk allowed (atau terdeteksi via ekstensi)
   if (!allowedExtensions.includes(ext) || !allowedMimeTypes.includes(mime)) {
     return cb(
       new ValidationError('Format file foto harus berupa JPG, JPEG, atau PNG', [

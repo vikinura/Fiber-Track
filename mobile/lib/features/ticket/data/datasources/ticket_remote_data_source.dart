@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/error/exceptions.dart';
@@ -383,19 +384,33 @@ class TicketRemoteDataSourceImpl implements TicketRemoteDataSource {
   }) async {
     try {
       final fileName = filePath.split(RegExp(r'[/\\]')).last;
+      final ext = fileName.contains('.')
+          ? fileName.split('.').last.toLowerCase()
+          : 'jpg';
+      final mediaType = ext == 'png'
+          ? MediaType('image', 'png')
+          : (ext == 'jpg' || ext == 'jpeg')
+          ? MediaType('image', 'jpeg')
+          : MediaType('image', 'jpeg');
+
       final MultipartFile multipartFile;
 
       if (kIsWeb) {
         final xFile = XFile(filePath);
         final bytes = await xFile.readAsBytes();
+        final actualName = xFile.name.isNotEmpty
+            ? xFile.name
+            : (fileName.isNotEmpty ? fileName : 'photo.$ext');
         multipartFile = MultipartFile.fromBytes(
           bytes,
-          filename: fileName.isNotEmpty ? fileName : 'upload.jpg',
+          filename: actualName,
+          contentType: mediaType,
         );
       } else {
         multipartFile = await MultipartFile.fromFile(
           filePath,
           filename: fileName,
+          contentType: mediaType,
         );
       }
 
