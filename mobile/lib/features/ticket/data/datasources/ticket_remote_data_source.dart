@@ -398,9 +398,12 @@ class TicketRemoteDataSourceImpl implements TicketRemoteDataSource {
       if (kIsWeb) {
         final xFile = XFile(filePath);
         final bytes = await xFile.readAsBytes();
-        final actualName = xFile.name.isNotEmpty
+        var actualName = xFile.name.isNotEmpty
             ? xFile.name
-            : (fileName.isNotEmpty ? fileName : 'photo.$ext');
+            : (fileName.isNotEmpty ? fileName : 'photo.png');
+        if (!actualName.contains('.')) {
+          actualName = '$actualName.png';
+        }
         multipartFile = MultipartFile.fromBytes(
           bytes,
           filename: actualName,

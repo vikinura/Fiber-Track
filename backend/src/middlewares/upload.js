@@ -16,7 +16,12 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
+    let ext = path.extname(file.originalname).toLowerCase();
+    if (!ext) {
+      if (file.mimetype === 'image/png') ext = '.png';
+      else if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') ext = '.jpg';
+      else ext = '.png'; // Default fallback untuk flutter web blob upload
+    }
     const randomName = crypto.randomUUID();
     cb(null, `${randomName}${ext}`);
   },
@@ -24,18 +29,29 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
   const allowedExtensions = ['.jpg', '.jpeg', '.png'];
-  const allowedMimeTypes = [
-    'image/jpeg',
-    'image/png',
-    'image/jpg',
-    'application/octet-stream', // Fallback browser MIME ketika Content-Type file tidak terdeteksi otomatis
-  ];
-
   const ext = path.extname(file.originalname).toLowerCase();
-  const mime = file.mimetype.toLowerCase();
+  const mime = (file.mimetype || '').toLowerCase();
 
-  // Valid jika ekstensi termasuk JPG/JPEG/PNG dan MIME termasuk allowed (atau terdeteksi via ekstensi)
-  if (!allowedExtensions.includes(ext) || !allowedMimeTypes.includes(mime)) {
+  // Validasi:
+  // 1. Jika ada ekstensi, pastikan jpg/jpeg/png
+  // 2. Jika tidak ada ekstensi (misal upload blob Chrome Web: nama 'blob'), izinkan selama mime image/* atau octet-stream
+  const isValidExt = allowedExtensions.includes(ext);
+  const isValidMime =
+    mime.startsWith('image/') ||
+    mime === 'application/octet-stream' ||
+    mime === '';
+
+  // Tolak hanya jika ada ekstensi tapi bukan gambar (misal .exe, .pdf) ATAU mime jelas bukan gambar (misal text/plain)
+  if (ext && !isValidExt) {
+    return cb(
+      new ValidationError('Format file foto harus berupa JPG, JPEG, atau PNG', [
+        { field: 'photo', message: 'Hanya file JPG, JPEG, dan PNG yang diizinkan' },
+      ]),
+      false
+    );
+  }
+
+  if (mime && !isValidMime) {
     return cb(
       new ValidationError('Format file foto harus berupa JPG, JPEG, atau PNG', [
         { field: 'photo', message: 'Hanya file JPG, JPEG, dan PNG yang diizinkan' },
