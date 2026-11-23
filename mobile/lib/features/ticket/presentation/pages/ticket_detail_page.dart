@@ -361,7 +361,7 @@ class _TicketDetailContent extends StatelessWidget {
                               .onPrimary,
                         ),
                         icon: const Icon(Icons.check_circle_outline, size: 18),
-                        label: const Text('Selesaikan Tiket'),
+                        label: const Text('Selesai'),
                       ),
                     ],
                   ),

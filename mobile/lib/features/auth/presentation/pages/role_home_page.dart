@@ -52,11 +52,11 @@ class RoleHomePage extends StatelessWidget {
   String _getPrimaryActionLabel(String? role) {
     switch (role) {
       case 'vendor_admin':
-        return 'Buka Tiket Masuk';
+        return 'Tiket Masuk';
       case 'technician':
-        return 'Buka Tugas Saya';
+        return 'Tugas Saya';
       default:
-        return 'Buka Daftar Tiket';
+        return 'Daftar Tiket';
     }
   }
 
@@ -204,7 +204,7 @@ class RoleHomePage extends StatelessWidget {
                             context.push('/tickets/create');
                           },
                           icon: const Icon(Icons.add_rounded),
-                          label: const Text('Buat Tiket Baru'),
+                          label: const Text('Buat Tiket'),
                         ),
                       ),
                       const SizedBox(height: AppSizes.p12),
@@ -215,7 +215,7 @@ class RoleHomePage extends StatelessWidget {
                             context.push('/dashboard');
                           },
                           icon: const Icon(Icons.dashboard_outlined),
-                          label: const Text('Buka Dashboard Rekap'),
+                          label: const Text('Dashboard'),
                         ),
                       ),
                       const SizedBox(height: AppSizes.p12),
@@ -226,7 +226,7 @@ class RoleHomePage extends StatelessWidget {
                             context.push('/master/areas');
                           },
                           icon: const Icon(Icons.map_outlined),
-                          label: const Text('Kelola Area Jaringan'),
+                          label: const Text('Data Area'),
                         ),
                       ),
                       const SizedBox(height: AppSizes.p12),
@@ -237,7 +237,7 @@ class RoleHomePage extends StatelessWidget {
                             context.push('/master/customers');
                           },
                           icon: const Icon(Icons.people_outline_rounded),
-                          label: const Text('Kelola Data Pelanggan'),
+                          label: const Text('Data Pelanggan'),
                         ),
                       ),
                     ],
